@@ -196,7 +196,11 @@ def FIM(
 
         def function_fim(*d):
             estimates = function(*d)
-            return estimates
+            lambda_ = kwargs.get('lambda_')
+            new_idxs = kwargs.get('new_idxs')
+            lambda_ = torch.ones_like(estimates) + lambda_
+            lambda_[new_idxs] = 1
+            return lambda_ * estimates
 
     else:
         raise NotImplementedError
