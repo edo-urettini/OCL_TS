@@ -1,1 +1,6 @@
 checkpoints/
+
+ng.py
+venv*/
+WTH/
+.vscode/

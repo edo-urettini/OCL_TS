@@ -79,6 +79,21 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     state_dict[name[len('module.'):]] = state_dict[name]
                 del state_dict[name]
             self.model[0].encoder.load_state_dict(state_dict)
+        
+        ########################
+        # ATTRIBUTES FOR OCAR
+        self.tau = 0
+        self.representation = PMatEKFAC
+        self.variant = 'regression'
+        self.regul = 1e-8
+        self.lambda_ = 1
+        self.F_ema = None
+        self.F_ema_inv = None
+        self.alpha_ema = 1
+        self.alpha_ema_last = self.alpha_ema
+        self.iterations = 0
+        self.output_size = None
+        ########################
 
     def _get_data(self, flag):
         args = self.args
@@ -180,7 +195,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 iter_count += 1
 
                 self.opt.zero_grad()
-                pred, true = self._process_one_batch(
+                pred, true, x = self._process_one_batch(
                     train_data, batch_x, batch_y, batch_x_mark, batch_y_mark)
                 loss = criterion(pred, true)
                 train_loss.append(loss.item())
@@ -199,7 +214,10 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     scaler.update()
                 else:
                     loss.backward()
-                    
+                    # mettere qua OCAR
+                    ###################
+                    self.before_update(x, pred, true)
+                    ###################
                     self.opt.step()
                 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
@@ -225,7 +243,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.model.eval()
         total_loss = []
         for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(vali_loader):
-            pred, true = self._process_one_batch(
+            pred, true, _ = self._process_one_batch(
                 vali_data, batch_x, batch_y, batch_x_mark, batch_y_mark, mode='vali')
             loss = criterion(pred.detach().cpu(), true.detach().cpu())
             total_loss.append(loss)
@@ -251,7 +269,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
         #for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(test_loader):
         for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(tqdm(test_loader)):
-            pred, true = self._process_one_batch(
+            pred, true, _ = self._process_one_batch(
                 test_data, batch_x, batch_y, batch_x_mark, batch_y_mark, mode='test')
             preds.append(pred.detach().cpu())
             trues.append(true.detach().cpu())
@@ -287,7 +305,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
             outputs = self.model(x)
         f_dim = -1 if self.args.features=='MS' else 0
         batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
-        return outputs, rearrange(batch_y, 'b t d -> b (t d)')
+        return outputs, rearrange(batch_y, 'b t d -> b (t d)'), x   # return x to use them in the fisher
     
     def _ol_one_batch(self,dataset_object, batch_x, batch_y, batch_x_mark, batch_y_mark):
         true = rearrange(batch_y, 'b t d -> b (t d)').float().to(self.device)
@@ -308,6 +326,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 out = self.model(buff_x)
                 loss += 0.2* criterion(out, buff_y)
             loss.backward()
+            # mettere qua OCAR
+            ###################
+            # concatenate curr data and buffer data
+            mb_x = torch.cat([x, buff_x], dim=0)
+            mb_output = torch.cat([outputs, out], dim=0)
+            mb_y = torch.cat([true, buff_y], dim=0)
+            self.before_update(mb_x, mb_output, mb_y)
+            ###################
             self.opt.step()       
             
             self.opt.zero_grad()
@@ -319,3 +345,154 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.buffer.add_data(examples = x, labels = true, logits = idx)
         return outputs, rearrange(batch_y, 'b t d -> b (t d)')
 
+
+
+
+
+
+    def before_update(self, mb_x, mb_output, mb_y):
+        '''This should not be needed
+        # Check if new classes are observed
+        curr_classes = set(strategy.experience.classes_in_this_experience)
+        new_classes = curr_classes - self.known_classes    
+        if new_classes:
+            self.known_classes.update(curr_classes)
+        '''
+
+
+        #Compute the weights for the FIM to compensate for different classes frequencies
+        batch_size = int(mb_x.size(0))
+        weights = torch.ones(batch_size, device=self.device)
+        '''This should not be needed
+        n_known = len(self.known_classes)
+        if len(self.buffer_idx) == len(weights):
+            #######WARNING, MODIFIED FOR CLEAR########
+            if self.iterations % strategy.train_epochs == 0:
+                weights[self.buffer_idx] = self.n_new 
+                self.n_new = self.n_new + strategy.train_epochs * self.regul
+        '''
+
+        if self.tau == 0:
+            self.tau = self.opt.param_groups[0]['lr']
+        else:
+            self.tau = self.tau + self.regul
+
+        #Create a temporary dataloader to compute the FIM
+        temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
+        temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
+
+        if self.representation == PMatEKFAC and self.F_ema is not None:
+            old_diag = self.F_ema.data[1]
+        else:
+            old_diag = None
+
+        if mb_output.size(1) != self.output_size:
+            self.iterations = 0
+        
+        if self.iterations % self.args.train_epochs == 0:
+            #Compute and update the FIM
+            # FIM must not compute the gradients
+            #with torch.no_grad():
+            F = FIM(model=self.model,
+                    loader=temp_dataloader,
+                    representation=self.representation,
+                    n_output=mb_output.size(1),
+                    variant=self.variant, 
+                    device=self.device,
+                    lambda_=self.lambda_, 
+                    weights=weights)
+
+            #Update the EMA of the FIM
+            if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
+                self.F_ema = F
+            else:
+                self.F_ema = self.EMA_kfac(self.F_ema, F)
+
+            self.F_ema_inv = self.F_ema.inverse(regul = self.tau)
+
+        self.iterations += 1
+
+        if self.representation == PMatEKFAC:
+            self.F_ema.update_diag(temp_dataloader)
+            if old_diag is not None:
+                self.F_ema = self.EMA_diag(old_diag, self.F_ema)
+
+        #original_last_known = torch.norm(strategy.model.linear.classifier.weight.grad[list(self.known_classes), :].flatten())
+        #original_last_new = torch.norm(strategy.model.linear.classifier.weight.grad[list(new_classes), :].flatten())
+
+        #Size of the output layer
+        self.output_size = mb_output.size(1)
+
+
+        #Compute the regularized gradient
+        original_grad_vec = PVector.from_model_grad(self.model)
+        regularized_grad = self.F_ema_inv.mv(original_grad_vec)
+        regularized_grad.to_model_grad(self.model)
+
+    def EMA_kfac(self, mat_old, mat_new):
+        """
+        Compute the exponential moving average of two PMatKFAC matrices.
+
+        :param mat_old: The previous PMatKFAC matrix.
+        :param mat_new: The new PMatKFAC matrix.
+        :return: A new PMatKFAC matrix representing the EMA.
+        """
+        if self.representation == PMatEKFAC:
+            old = mat_old.data[0]
+            new = mat_new.data[0]
+        else:
+            old = mat_old.data
+            new = mat_new.data
+
+        last_old_layer = list(old.keys())[-1]
+        last_new_layer = list(new.keys())[-1]
+        shared_keys = old.keys() & new.keys()
+        
+        for layer_id in shared_keys:
+            a_old, g_old = old[layer_id]
+            a_new, g_new = new[layer_id]
+
+            ema_a = (1 - self.alpha_ema) * a_old + self.alpha_ema * a_new
+            ema_g = (1 - self.alpha_ema) * g_old + self.alpha_ema * g_new
+
+            new[layer_id] = (ema_a, ema_g)
+        
+       
+        if last_old_layer != last_new_layer and self.alpha_ema_last < 1.0:
+            a_old_last, g_old_last = old[last_old_layer]
+            a_new_last, g_new_last = new[last_new_layer]
+
+            ema_a_last = (1 - self.alpha_ema_last) * a_old_last + self.alpha_ema_last * a_new_last
+            
+            #g_new_last = g_new_last * self.alpha_ema_last + (1 - self.alpha_ema_last) 
+
+            new[last_new_layer] = (ema_a_last, g_new_last)
+
+        if self.representation == PMatEKFAC:
+            mat_new.data = (new, mat_new.data[1])
+        else:
+            mat_new.data = new
+ 
+         # Create a new PMatKFAC instance with the EMA data
+        return mat_new
+
+
+    def EMA_diag(self, diag_old, mat_new):
+        #Compute the EMA of the diagonal of the FIM when using PMatEkfac representation
+        old = diag_old
+        new = mat_new.data[1]
+
+        shared_keys = old.keys() & new.keys()
+        last_old_layer = list(old.keys())[-1]
+        last_new_layer = list(new.keys())[-1]
+
+        for layer_id in shared_keys:
+            old_diag = old[layer_id]
+            new_diag = new[layer_id]
+
+            ema_diag = (1 - self.alpha_ema) * old_diag + self.alpha_ema * new_diag
+            new[layer_id] = ema_diag
+
+        mat_new.data = (mat_new.data[0], new)
+
+        return mat_new
