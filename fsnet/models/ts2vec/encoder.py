@@ -59,7 +59,11 @@ class TSEncoder(nn.Module):
         x = x * (~nan_mask).int().unsqueeze(-1)
         assert torch.all(x == x_clone)
         ### test end
+        #Reshape for FIM computation (requires 2D)
+        B, T, C = x.shape
+        x = x.view(B*T, C)
         x = self.input_fc(x)  # B x T x Ch
+        x = x.view(B, T, -1)
         
         # generate & apply mask
         if mask is None:
@@ -82,7 +86,7 @@ class TSEncoder(nn.Module):
         
         ### test
         x_clone = x.clone()
-        mask &= nan_mask
+        mask &= ~nan_mask
         x_clone[~mask] = 0
         x = x * mask.int().unsqueeze(-1)
         assert torch.all(x == x_clone)

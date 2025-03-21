@@ -83,16 +83,17 @@ class Exp_TS2VecSupervised(Exp_Basic):
         ########################
         # ATTRIBUTES FOR OCAR
         self.tau = 0
-        self.representation = PMatEKFAC
+        self.representation = PMatKFAC
         self.variant = 'regression'
         self.regul = 1e-8
         self.lambda_ = 1
         self.F_ema = None
         self.F_ema_inv = None
-        self.alpha_ema = 1
+        self.alpha_ema = 0.1
         self.alpha_ema_last = self.alpha_ema
         self.iterations = 0
         self.output_size = None
+        self.freq = 1
         ########################
 
     def _get_data(self, flag):
@@ -158,7 +159,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return data_set, data_loader
 
     def _select_optimizer(self):
-        self.opt = optim.AdamW(self.model.parameters(), lr=self.args.learning_rate)
+        self.opt = optim.SGD(self.model.parameters(), lr=self.args.learning_rate)
         return self.opt
 
     def _select_criterion(self):
@@ -269,7 +270,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
         #for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(test_loader):
         for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(tqdm(test_loader)):
-            pred, true, _ = self._process_one_batch(
+            pred, true = self._process_one_batch(
                 test_data, batch_x, batch_y, batch_x_mark, batch_y_mark, mode='test')
             preds.append(pred.detach().cpu())
             trues.append(true.detach().cpu())
@@ -329,9 +330,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
             # mettere qua OCAR
             ###################
             # concatenate curr data and buffer data
-            mb_x = torch.cat([x, buff_x], dim=0)
-            mb_output = torch.cat([outputs, out], dim=0)
-            mb_y = torch.cat([true, buff_y], dim=0)
+            if not self.buffer.is_empty():
+                mb_x = torch.cat([x, buff_x], dim=0)
+                mb_output = torch.cat([outputs, out], dim=0)
+                mb_y = torch.cat([true, buff_y], dim=0)
+            else:
+                mb_x = x
+                mb_output = outputs
+                mb_y = true
             self.before_update(mb_x, mb_output, mb_y)
             ###################
             self.opt.step()       
@@ -386,10 +392,10 @@ class Exp_TS2VecSupervised(Exp_Basic):
         else:
             old_diag = None
 
-        if mb_output.size(1) != self.output_size:
-            self.iterations = 0
+        #if mb_output.size(1) != self.output_size:
+        #    self.iterations = 0
         
-        if self.iterations % self.args.train_epochs == 0:
+        if self.iterations % self.freq == 0:
             #Compute and update the FIM
             # FIM must not compute the gradients
             #with torch.no_grad():
@@ -399,16 +405,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     n_output=mb_output.size(1),
                     variant=self.variant, 
                     device=self.device,
-                    lambda_=self.lambda_, 
-                    weights=weights)
+                    lambda_=self.lambda_)
 
             #Update the EMA of the FIM
             if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
                 self.F_ema = F
             else:
                 self.F_ema = self.EMA_kfac(self.F_ema, F)
-
-            self.F_ema_inv = self.F_ema.inverse(regul = self.tau)
+            self.F_ema_inv = self.F_ema.inverse(regul = 10*self.opt.param_groups[0]['lr'])
 
         self.iterations += 1
 

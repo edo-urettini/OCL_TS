@@ -4,3 +4,9 @@ ng.py
 venv*/
 WTH/
 .vscode/
+.DS_Store
+.DS_Store?
+.idea
+*.pyc
+**/__pycache__/
+results*/
