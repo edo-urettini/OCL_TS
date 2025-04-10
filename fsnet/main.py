@@ -121,8 +121,8 @@ parser.add_argument('--lradj', type=str, default='type1',help='adjust learning r
 parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
 parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
 #parser.add_argument('--method', type=str, default='online')
-#parser.add_argument('--method', type=str, default='er')
-parser.add_argument('--method', type=str, default='ocar')
+parser.add_argument('--method', type=str, default='er_clever')
+#parser.add_argument('--method', type=str, default='fsnet')
 
 parser.add_argument('--teacher_forcing', action='store_true', help='use teacher forcing during forecasting', default=False)
 parser.add_argument('--online_learning', type=str, default='full')
@@ -175,6 +175,11 @@ args.freq = args.freq[-1:]
 
 print('Args in experiment:')
 print(args)
+#######################
+if args.method == 'er_clever':
+    args.buffer_size = 500
+    args.n_replay = 2   #20 8
+#######################
 
 #Exp = Exp_TS2VecSupervised
 Exp = getattr(importlib.import_module('exp.exp_{}'.format(args.method)), 'Exp_TS2VecSupervised')

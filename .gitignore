@@ -1,6 +1,7 @@
 checkpoints/
 
 ng.py
+test.ipynb
 venv*/
 WTH/
 .vscode/

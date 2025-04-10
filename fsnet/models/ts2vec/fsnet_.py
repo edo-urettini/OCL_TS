@@ -40,8 +40,15 @@ class SamePadConv(nn.Module):
         self.chunk_in_d = self.dim // self.n_chunks
         self.chunk_out_d = int(in_channels*kernel_size// self.n_chunks)
         
-        self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0).cuda()
-        self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0).cuda()
+        if torch.cuda.is_available():
+            self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0).cuda()
+            self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0).cuda()
+        elif torch.backends.mps.is_available():
+            self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0).to('mps')
+            self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0).to('mps')
+        else:
+            self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0)
+            self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0)
         nh=64
         self.controller = nn.Sequential(nn.Linear(self.chunk_in_d, nh), nn.SiLU())
         self.calib_w = nn.Linear(nh, self.chunk_out_d)
@@ -90,7 +97,12 @@ class SamePadConv(nn.Module):
         f = self.calib_f(rep)
         q = torch.cat([w.view(-1), b.view(-1), f.view(-1)])
         if not hasattr(self, 'q_ema'):
-            setattr(self, 'q_ema', torch.zeros(*q.size()).float().cuda())
+            if torch.cuda.is_available():
+                setattr(self, 'q_ema', torch.zeros(*q.size()).float().cuda())
+            elif torch.backends.mps.is_available():
+                setattr(self, 'q_ema', torch.zeros(*q.size()).float().to('mps'))
+            else:
+                setattr(self, 'q_ema', torch.zeros(*q.size()).float())
         else:
             self.q_ema = self.f_gamma * self.q_ema + (1-self.f_gamma)*q
             q = self.q_ema
@@ -107,10 +119,20 @@ class SamePadConv(nn.Module):
             idx = idx.unsqueeze(1).float()
             old_w = ww @ idx
             # write memory
-            s_att = torch.zeros(att.size(0)).cuda()
+            if torch.cuda.is_available():
+                s_att = torch.zeros(att.size(0)).cuda()
+            elif torch.backends.mps.is_available():
+                s_att = torch.zeros(att.size(0)).to('mps')
+            else:
+                s_att = torch.zeros(att.size(0))
             s_att[idx.squeeze().long()] = v.squeeze()
             W = old_w @ s_att.unsqueeze(0)
-            mask = torch.ones(W.size()).cuda()
+            if torch.cuda.is_available():
+                mask = torch.ones(W.size()).cuda()
+            elif torch.backends.mps.is_available():
+                mask = torch.ones(W.size()).to('mps')
+            else:
+                mask = torch.ones(W.size())
             mask[:, idx.squeeze().long()] = self.tau
             self.W.data = mask * self.W.data + (1-mask) * W
             self.W.data = normalize(self.W.data)   

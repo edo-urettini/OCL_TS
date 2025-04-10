@@ -17,6 +17,10 @@ class Exp_Basic(object):
             os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.gpu) if not self.args.use_multi_gpu else self.args.devices
             device = torch.device('cuda:{}'.format(self.args.gpu))
             print('Use GPU: cuda:{}'.format(self.args.gpu))
+        elif torch.backends.mps.is_available():
+            # for MAC
+            device = torch.device("mps")
+            print('Use MPS')
         else:
             device = torch.device('cpu')
             print('Use CPU')

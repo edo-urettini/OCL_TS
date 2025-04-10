@@ -16,6 +16,7 @@ def reservoir(num_seen_examples: int, buffer_size: int) -> int:
     :param buffer_size: the maximum buffer size
     :return: the target index if the current image is sampled, else -1
     """
+    # original
     if num_seen_examples < buffer_size:
         return num_seen_examples
 
@@ -24,6 +25,8 @@ def reservoir(num_seen_examples: int, buffer_size: int) -> int:
         return rand
     else:
         return -1
+    # fifo
+    # return num_seen_examples % buffer_size
 
 
 def ring(num_seen_examples: int, buffer_portion_size: int, task: int) -> int:
@@ -97,8 +100,16 @@ class Buffer:
         if size > min(self.num_seen_examples, self.examples.shape[0]):
             size = min(self.num_seen_examples, self.examples.shape[0])
 
+        # original
         choice = np.random.choice(min(self.num_seen_examples, self.examples.shape[0]),
                                   size=size, replace=False)
+        # FIFO
+        #choice = [i % self.buffer_size for i in range(self.num_seen_examples - size, self.num_seen_examples)]
+        # uniform
+        #step = min(self.num_seen_examples, self.examples.shape[0]) // size
+        #choice = [i % self.buffer_size for i in range(0, min(self.num_seen_examples, self.examples.shape[0]), step)]
+
+
         if transform is None: transform = lambda x: x
         ret_tuple = (torch.stack([transform(ee.cpu())
                             for ee in self.examples[choice]]).to(self.device),)
