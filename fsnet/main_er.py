@@ -205,7 +205,7 @@ def objective(config):
         mae.append(mae_)
         mse.append(mse_)
 
-        tune.report({"mae": mae_, "mse": mse_})
+        tune.report({"mae": m[0]})#, "mse": m[1]})
 
         #torch.cuda.empty_cache()
 
@@ -226,7 +226,7 @@ search_space = {
     "buffer_size": tune.choice([500]),
     "test_lr": tune.loguniform(1e-5, 1e-2),
     "n_replay": tune.choice([2, 4, 8, 16]),
-    "er_loss_weight": tune.loguniform(1e-2, 1)
+    "er_loss_weight": tune.loguniform(1e-2, 10)
     }
 search_alg = HyperOptSearch(metric="mae", mode="min")
 tuner = tune.Tuner(
@@ -236,17 +236,23 @@ tuner = tune.Tuner(
         metric="mae",
         mode="min",
         search_alg=search_alg,
-        num_samples=20,
-        max_concurrent_trials=5
+        num_samples=10,
+        max_concurrent_trials=10
     ),
-    run_config=tune.RunConfig()
+    run_config=tune.RunConfig()#log_to_file=True, name="tune_log_{}".format(args.method)),
 )
 
 results = tuner.fit()
 
-#print("Best hyperparameters found were: ", results.get_best_result().metrics)
+#dfs = {result.path: result.metrics_dataframe for result in results}
+for i, result in enumerate(results):
+    if result.error:
+        print(f"Trial #{i} had an error:", result.error)
+        continue
 
-import pickle
-with open('results.pkl', 'wb') as f:
-    pickle.dump(results, f)
-    
+    print(
+        f"Trial #{i} finished successfully with a mea of:",
+        result.metrics["mae"]
+    )
+
+print(results.get_dataframe())
