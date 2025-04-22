@@ -216,7 +216,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
 
-        return self.model
+        return self.model, best_model_path
 
     def vali(self, vali_data, vali_loader, criterion):
         self.model.eval()
@@ -230,8 +230,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.model.train()
         return total_loss
 
-    def test(self, setting):
-        test_data, test_loader = self._get_data(flag='test')
+    def test(self, setting, data='test'):
+        test_data, test_loader = self._get_data(flag=data)
+
+        #reset optimizer to SGD using online_lr
+        self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
 
         self.model.eval()
         if self.online == 'regressor':

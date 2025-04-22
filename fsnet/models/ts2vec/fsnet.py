@@ -38,7 +38,8 @@ class TSEncoder(nn.Module):
         self.output_dims = output_dims
         self.hidden_dims = hidden_dims
         self.mask_mode = mask_mode
-        self.input_fc = nn.Linear(input_dims, hidden_dims)
+        #self.input_fc = nn.Linear(input_dims, hidden_dims)
+        self.input_fc = nn.Conv1d(input_dims, hidden_dims, 1)
         self.feature_extractor = DilatedConvEncoder(
             hidden_dims,
             [hidden_dims] * depth + [output_dims],
@@ -53,9 +54,19 @@ class TSEncoder(nn.Module):
         return self.feature_extractor.ctrl_params()
 
     def forward(self, x, mask=None):  # x: B x T x input_dims
-        nan_mask = ~x.isnan().any(axis=-1)
-        x[~nan_mask] = 0
-        x = self.input_fc(x)  # B x T x Ch
+         ### test 
+        x_clone = x.clone()
+        nan_mask = ~x_clone.isnan().any(axis=-1)
+        x_clone[~nan_mask] = 0
+        # multiply the x with the nan_mask
+        nan_mask = x.isnan().any(axis=-1)
+        x = x * (~nan_mask).int().unsqueeze(-1)
+        #assert torch.all(x == x_clone)
+        ### test end
+        #Transpose for Conv1d
+        x = x.transpose(1, 2)  # B x Ch x T
+        x = self.input_fc(x)  # B x Co x T
+        x = x.transpose(1, 2)  # B x T x Co
         
         # generate & apply mask
         if mask is None:
@@ -76,8 +87,13 @@ class TSEncoder(nn.Module):
             mask = x.new_full((x.size(0), x.size(1)), True, dtype=torch.bool)
             mask[:, -1] = False
         
-        mask &= nan_mask
-        x[~mask] = 0
+        ### test
+        x_clone = x.clone()
+        mask &= ~nan_mask
+        x_clone[~mask] = 0
+        x = x * mask.int().unsqueeze(-1)
+        #assert torch.all(x == x_clone)
+        ### test end
         
         # conv encoder
         x = x.transpose(1, 2)  # B x Ch x T

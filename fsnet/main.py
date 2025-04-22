@@ -7,67 +7,18 @@ import uuid
 import datetime
 import importlib
 
+from tuning import online_hpo
+from utils.tools import init_dl_program
+
 #from exp.exp_online import Exp_TS2VecSupervised
 
-
-def init_dl_program(
-        device_name,
-        seed=None,
-        use_cudnn=True,
-        deterministic=False,
-        benchmark=False,
-        use_tf32=False,
-        max_threads=None
-):
-    import torch
-    if max_threads is not None:
-        torch.set_num_threads(max_threads)  # intraop
-        if torch.get_num_interop_threads() != max_threads:
-            torch.set_num_interop_threads(max_threads)  # interop
-        try:
-            import mkl
-        except:
-            pass
-        else:
-            mkl.set_num_threads(max_threads)
-
-    if seed is not None:
-        random.seed(seed)
-        seed += 1
-        np.random.seed(seed)
-        seed += 1
-        torch.manual_seed(seed)
-
-    if isinstance(device_name, (str, int)):
-        device_name = [device_name]
-
-    devices = []
-    for t in reversed(device_name):
-        t_device = torch.device(t)
-        devices.append(t_device)
-        if t_device.type == 'cuda':
-            assert torch.cuda.is_available()
-            torch.cuda.set_device(t_device)
-            if seed is not None:
-                seed += 1
-                torch.cuda.manual_seed(seed)
-    devices.reverse()
-    torch.backends.cudnn.enabled = use_cudnn
-    torch.backends.cudnn.deterministic = deterministic
-    torch.backends.cudnn.benchmark = benchmark
-
-    if hasattr(torch.backends.cudnn, 'allow_tf32'):
-        torch.backends.cudnn.allow_tf32 = use_tf32
-        torch.backends.cuda.matmul.allow_tf32 = use_tf32
-
-    return devices if len(devices) > 1 else devices[0]
 
 parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
 
 #parser.add_argument('--data', type=str, required=True, default='ETTh1', help='data')
 parser.add_argument('--data', type=str, required=False, default='WTH', help='data')
 #parser.add_argument('--root_path', type=str, default='./data/ETT/', help='root path of the data file')
-parser.add_argument('--root_path', type=str, default='./fsnet/data/WTH/', help='root path of the data file')
+parser.add_argument('--root_path', type=str, default='/data/e.urettini/DATA/', help='root path of the data file')
 #parser.add_argument('--data_path', type=str, default='ETTh1.csv', help='data file')    
 parser.add_argument('--data_path', type=str, default='WTH.csv', help='data file')    
 parser.add_argument('--features', type=str, default='M', help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
@@ -121,8 +72,7 @@ parser.add_argument('--lradj', type=str, default='type1',help='adjust learning r
 parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
 parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
 #parser.add_argument('--method', type=str, default='online')
-#parser.add_argument('--method', type=str, default='er')
-parser.add_argument('--method', type=str, default='ocar')
+parser.add_argument('--method', type=str, default='er')
 
 parser.add_argument('--teacher_forcing', action='store_true', help='use teacher forcing during forecasting', default=False)
 parser.add_argument('--online_learning', type=str, default='full')
@@ -138,6 +88,12 @@ parser.add_argument('--devices', type=str, default='0,1,2,3',help='device ids of
 
 parser.add_argument('--finetune', action='store_true', default=False)
 parser.add_argument('--finetune_model_seed', type=int)
+
+#OCAR
+parser.add_argument('--OCAR_regul', type=float, default=1e-3)
+parser.add_argument('--OCAR_regul_last', type=float, default=1e-3)
+parser.add_argument('--OCAR_alpha_ema', type=float, default=1.0)
+parser.add_argument('--online_lr', type=float, default=0.001)
 
 args = parser.parse_args()
 
@@ -194,7 +150,17 @@ for ii in range(args.itr):
     args.finetune_model_seed = ii
     exp = Exp(args) # set experiments
     print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
-    exp.train(setting)
+    _ , best_model_path = exp.train(setting)
+
+    #Hyperparameter tuning
+    best_config = online_hpo(args, exp, setting, best_model_path)
+    for key, value in best_config.items():
+        setattr(args, key, value)       
+    print('Best config: {}'.format(best_config))
+
+    #reset model to best_model_path
+    exp.model.load_state_dict(torch.load(best_model_path))
+    
     
     print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
     m, mae_, mse_, p, t = exp.test(setting)
@@ -219,4 +185,10 @@ np.save(folder_path + 'preds.npy', np.array(preds))
 np.save(folder_path + 'trues.npy', np.array(true))
 np.save(folder_path + 'mae.npy', np.array(mae))
 np.save(folder_path + 'mse.npy', np.array(mse))
+#save args in same folder
+import json
+with open(folder_path + 'args.json', 'w') as f:
+    json.dump(args.__dict__, f, indent=2)
+
+
 

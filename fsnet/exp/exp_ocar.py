@@ -85,15 +85,16 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.tau = 0
         self.representation = PMatKFAC
         self.variant = 'regression'
-        self.regul = 1e-8
-        self.lambda_ = 1
+        self.regul = self.args.OCAR_regul
+        self.regul_last = self.args.OCAR_regul_last
+        self.lambda_ = 1/8
         self.F_ema = None
         self.F_ema_inv = None
-        self.alpha_ema = 0.1
+        self.alpha_ema = self.args.OCAR_alpha_ema
         self.alpha_ema_last = self.alpha_ema
         self.iterations = 0
         self.output_size = None
-        self.freq = 1
+        self.freq = 10
         ########################
 
     def _get_data(self, flag):
@@ -159,7 +160,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return data_set, data_loader
 
     def _select_optimizer(self):
-        self.opt = optim.SGD(self.model.parameters(), lr=self.args.learning_rate)
+        self.opt = optim.AdamW(self.model.parameters(), lr=self.args.learning_rate)
         return self.opt
 
     def _select_criterion(self):
@@ -217,7 +218,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     loss.backward()
                     # mettere qua OCAR
                     ###################
-                    self.before_update(x, pred, true)
+                    #self.before_update(x, pred, true)
                     ###################
                     self.opt.step()
                 
@@ -238,7 +239,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
 
-        return self.model
+        return self.model, best_model_path
 
     def vali(self, vali_data, vali_loader, criterion):
         self.model.eval()
@@ -252,8 +253,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.model.train()
         return total_loss
 
-    def test(self, setting):
-        test_data, test_loader = self._get_data(flag='test')
+    def test(self, setting, data='test'):
+        test_data, test_loader = self._get_data(flag=data)
+
+        #reset optimizer to SGD using online_lr
+        self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
 
         self.model.eval()
         if self.online == 'regressor':
@@ -412,7 +416,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 self.F_ema = F
             else:
                 self.F_ema = self.EMA_kfac(self.F_ema, F)
-            self.F_ema_inv = self.F_ema.inverse(regul = 10*self.opt.param_groups[0]['lr'])
+            id_last = list(self.F_ema.data.keys())[-1]
+            self.F_ema_inv = self.F_ema.inverse(id_last=id_last, regul = self.regul, regul_last=self.regul_last)
 
         self.iterations += 1
 

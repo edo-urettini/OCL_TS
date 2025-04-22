@@ -1,0 +1,2 @@
+1) Only Custom_Dataset has been modified for a 15/15/70 split. 
+2) The folders for data and ray_results are absolute paths, hardcoded for my system

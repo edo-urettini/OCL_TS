@@ -38,7 +38,8 @@ class TSEncoder(nn.Module):
         self.output_dims = output_dims
         self.hidden_dims = hidden_dims
         self.mask_mode = mask_mode
-        self.input_fc = nn.Linear(input_dims, hidden_dims)
+        #self.input_fc = nn.Linear(input_dims, hidden_dims)
+        self.input_fc = nn.Conv1d(input_dims, hidden_dims, 1)
         self.feature_extractor = DilatedConvEncoder(
             hidden_dims,
             [hidden_dims] * depth + [output_dims],
@@ -57,13 +58,13 @@ class TSEncoder(nn.Module):
         # multiply the x with the nan_mask
         nan_mask = x.isnan().any(axis=-1)
         x = x * (~nan_mask).int().unsqueeze(-1)
-        assert torch.all(x == x_clone)
+        #assert torch.all(x == x_clone)
         ### test end
-        #Reshape for FIM computation (requires 2D)
-        B, T, C = x.shape
-        x = x.view(B*T, C)
-        x = self.input_fc(x)  # B x T x Ch
-        x = x.view(B, T, -1)
+        #Transpose for Conv1d
+        x = x.transpose(1, 2)  # B x Ch x T
+        x = self.input_fc(x)  # B x Co x T
+        x = x.transpose(1, 2)  # B x T x Co
+     
         
         # generate & apply mask
         if mask is None:
@@ -89,7 +90,7 @@ class TSEncoder(nn.Module):
         mask &= ~nan_mask
         x_clone[~mask] = 0
         x = x * mask.int().unsqueeze(-1)
-        assert torch.all(x == x_clone)
+        #assert torch.all(x == x_clone)
         ### test end
         
         # conv encoder
