@@ -7,7 +7,7 @@ from exp.exp_fsnet import FSNetExp
 from exp.exp_naive import NaiveExp
 
 
-from fsnet.utils.reproducibility import set_seed, seed_worker, get_dataloader_seed_generator
+from utils.reproducibility import set_seed, seed_worker, get_dataloader_seed_generator
 
 SEED, SEED_DL = 123, 42
 set_seed(SEED)
@@ -114,7 +114,7 @@ def prepare_config(experience_strategy: str, main_config_path: str):
 
 def main():
 
-    EXPERIENCE_STRATEGY = "er"  # alternatives: 'fsnet', 'er', 'naive'
+    EXPERIENCE_STRATEGY = "naive"  # alternatives: 'fsnet', 'er', 'naive'
     MAIN_CONFIG_PATH = "/Users/platypus/Desktop/OCL_TS/fsnet"
     exp_class, config = prepare_config(EXPERIENCE_STRATEGY, MAIN_CONFIG_PATH)
 
