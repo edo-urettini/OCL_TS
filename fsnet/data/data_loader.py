@@ -217,9 +217,21 @@ class Dataset_ETT_minute(Dataset):
 
 
 class Dataset_Custom(Dataset):
-    def __init__(self, root_path, flag='train', size=None, 
-                 features='S', data_path='ETTh1.csv', 
-                 target='OT', scale=True, inverse=False, timeenc=0, freq='h', cols=None):
+    def __init__(self, 
+                 root_path, 
+                 flag='train', 
+                 size=None, 
+                 features='S', 
+                 data_path='ETTh1.csv', 
+                 target='OT', 
+                 scale=True, 
+                 inverse=False, 
+                 timeenc=0, 
+                 freq='h', 
+                 cols=None,
+                 perc_warm_up=0.15,
+                 perc_val=0.15):
+        
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
@@ -244,29 +256,33 @@ class Dataset_Custom(Dataset):
         self.cols=cols
         self.root_path = root_path
         self.data_path = data_path
+        self.perc_warm_up = perc_warm_up
+        self.perc_val = perc_val
         self.__read_data__()
 
     def __read_data__(self):
         self.scaler = StandardScaler()
         df_raw = pd.read_csv(os.path.join(self.root_path,
                                           self.data_path))
-        '''
-        df_raw.columns: ['date', ...(other features), target feature]
-        '''
-        # cols = list(df_raw.columns); 
         
         if self.cols:
+           # we assume these do not include date 
             cols=self.cols.copy()
             cols.remove(self.target)
         else:
-            cols = list(df_raw.columns); cols.remove(self.target); cols.remove('date')
+            # if features columns are not specified, use every column except target (and data, that will be used later)
+            cols = list(df_raw.columns)
+            cols.remove(self.target)
+            cols.remove('date')
+        
+        # set df_raw to be -> date, ...data_cols..., target
         df_raw = df_raw[['date']+cols+[self.target]]
 
-        num_train = int(len(df_raw)*0.2)
-        num_test = int(len(df_raw)*0.75)
-        num_vali = len(df_raw) - num_train - num_test
-        border1s = [0, num_train-self.seq_len, len(df_raw)-num_test-self.seq_len]
-        border2s = [num_train, num_train+num_vali, len(df_raw)]
+        num_warm_up = int(len(df_raw) * self.perc_warm_up)
+        num_test = int(len(df_raw) * (1 - self.perc_warm_up - self.perc_val))
+        num_vali = len(df_raw) - num_warm_up - num_test
+        border1s = [0, num_warm_up - self.seq_len, len(df_raw) - num_test - self.seq_len]
+        border2s = [num_warm_up, num_warm_up + num_vali, len(df_raw)]
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
         
@@ -274,6 +290,9 @@ class Dataset_Custom(Dataset):
             cols_data = df_raw.columns[1:]
             df_data = df_raw[cols_data]
         elif self.features=='S':
+            ###
+            # I dont understand this
+            ###
             df_data = df_raw[[self.target]]
 
         if self.scale:
@@ -286,9 +305,12 @@ class Dataset_Custom(Dataset):
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         data_stamp = time_features(df_stamp, timeenc=self.timeenc, freq=self.freq)
-
+        ###
+        # NB: data_stamp are not normalized!!
+        ###
         self.data_x = data[border1:border2]
-        if self.inverse:
+        
+        if self.inverse:        # I think this distinghuishes between normalization and inverse normalization
             self.data_y = df_data.values[border1:border2]
         else:
             self.data_y = data[border1:border2]
@@ -297,10 +319,12 @@ class Dataset_Custom(Dataset):
     def __getitem__(self, index):
         s_begin = index
         s_end = s_begin + self.seq_len
+        # I don't understand this, is it for the Informer?
         r_begin = s_end - self.label_len 
         r_end = r_begin + self.label_len + self.pred_len
 
         seq_x = self.data_x[s_begin:s_end]
+        # Again, I don't understand this
         if self.inverse:
             seq_y = np.concatenate([self.data_x[r_begin:r_begin+self.label_len], self.data_y[r_begin+self.label_len:r_end]], 0)
         else:

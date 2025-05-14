@@ -9,7 +9,7 @@ from typing import Tuple
 from torchvision import transforms
 
 
-def reservoir(num_seen_examples: int, buffer_size: int) -> int:
+def reservoir(num_seen_examples: int, buffer_size: int, mode: str) -> int:
     """
     Reservoir sampling algorithm.
     :param num_seen_examples: the number of seen examples
@@ -17,16 +17,17 @@ def reservoir(num_seen_examples: int, buffer_size: int) -> int:
     :return: the target index if the current image is sampled, else -1
     """
     # original
-    if num_seen_examples < buffer_size:
-        return num_seen_examples
+    if mode == "reservoir":
+        if num_seen_examples < buffer_size:
+            return num_seen_examples
 
-    rand = np.random.randint(0, num_seen_examples + 1)
-    if rand < buffer_size:
-        return rand
-    else:
-        return -1
-    # fifo
-    # return num_seen_examples % buffer_size
+        rand = np.random.randint(0, num_seen_examples + 1)
+        if rand < buffer_size:
+            return rand
+        else:
+            return -1
+    if mode == "fifo":
+        return num_seen_examples % buffer_size
 
 
 def ring(num_seen_examples: int, buffer_portion_size: int, task: int) -> int:
@@ -37,16 +38,13 @@ class Buffer:
     """
     The memory buffer of rehearsal method.
     """
-    def __init__(self, buffer_size, device, n_tasks=1, mode='reservoir'):
-        assert mode in ['ring', 'reservoir']
+    def __init__(self, buffer_size, device, mode='reservoir'):
+        assert mode in ['fifo', 'reservoir']
+        self.mode = mode
+
         self.buffer_size = buffer_size
         self.device = device
         self.num_seen_examples = 0
-        self.functional_index = eval(mode)
-        if mode == 'ring':
-            assert n_tasks is not None
-            self.task_number = n_tasks
-            self.buffer_portion_size = buffer_size // n_tasks
         self.attributes = ['examples', 'labels', 'logits', 'task_labels']
 
     def init_tensors(self, examples: torch.Tensor, labels: torch.Tensor,
@@ -79,7 +77,7 @@ class Buffer:
             self.init_tensors(examples, labels, logits, task_labels)
 
         for i in range(examples.shape[0]):
-            index = reservoir(self.num_seen_examples, self.buffer_size)
+            index = reservoir(self.num_seen_examples, self.buffer_size, self.mode)
             self.num_seen_examples += 1
             if index >= 0:
                 self.examples[index] = examples[i].to(self.device)
@@ -100,14 +98,8 @@ class Buffer:
         if size > min(self.num_seen_examples, self.examples.shape[0]):
             size = min(self.num_seen_examples, self.examples.shape[0])
 
-        # original
         choice = np.random.choice(min(self.num_seen_examples, self.examples.shape[0]),
                                   size=size, replace=False)
-        # FIFO
-        #choice = [i % self.buffer_size for i in range(self.num_seen_examples - size, self.num_seen_examples)]
-        # uniform
-        #step = min(self.num_seen_examples, self.examples.shape[0]) // size
-        #choice = [i % self.buffer_size for i in range(0, min(self.num_seen_examples, self.examples.shape[0]), step)]
 
 
         if transform is None: transform = lambda x: x
@@ -152,3 +144,4 @@ class Buffer:
             if hasattr(self, attr_str):
                 delattr(self, attr_str)
         self.num_seen_examples = 0
+

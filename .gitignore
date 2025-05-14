@@ -11,3 +11,4 @@ WTH/
 *.pyc
 **/__pycache__/
 results*/
+old/
