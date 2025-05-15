@@ -20,8 +20,11 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV, train_test_split
 from nngeometry.metrics import FIM
 from nngeometry.object import PMatDiag, PMatBlockDiag, PMatKFAC, PMatEKFAC, PMatDense, PMatQuasiDiag, PVector
+from nngeometry.layercollection import LayerCollection
+from utils.stats import StudentTLoss
+from scipy.stats import norm
 
-import os
+import os, csv
 import time
 from pathlib import Path
 
@@ -84,17 +87,23 @@ class Exp_TS2VecSupervised(Exp_Basic):
         # ATTRIBUTES FOR OCAR
         self.tau = 0
         self.representation = PMatKFAC
-        self.variant = 'regression'
+        self.variant = 'student_t'
         self.regul = self.args.OCAR_regul
         self.regul_last = self.args.OCAR_regul_last
-        self.lambda_ = 1/8
+        self.lambda_ = 0.2
         self.F_ema = None
         self.F_ema_inv = None
         self.alpha_ema = self.args.OCAR_alpha_ema
         self.alpha_ema_last = self.alpha_ema
         self.iterations = 0
-        self.output_size = None
-        self.freq = 10
+        self.freq = 100
+        self.deg_f = self.args.deg_f
+        self.ng_only_last = self.args.ng_only_last
+        self.scale = 1.0
+        self.loss_mean = 0.0
+        self.loss_sq_mean= 0.0
+        self.z = norm.ppf(0.99)
+        self.loss = 0.0
         ########################
 
     def _get_data(self, flag):
@@ -164,7 +173,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return self.opt
 
     def _select_criterion(self):
-        criterion = nn.MSELoss()
+        #criterion = nn.MSELoss()
+        criterion = StudentTLoss(nu=self.deg_f, reduction='mean', scale=self.scale)
         return criterion
 
     def train(self, setting):
@@ -330,9 +340,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 buff_x, buff_y, idx = self.buffer.get_data(8)
                 out = self.model(buff_x)
                 loss += 0.2* criterion(out, buff_y)
+            loss = loss / 1.2
             loss.backward()
             # mettere qua OCAR
             ###################
+            self.loss = loss.item()
             # concatenate curr data and buffer data
             if not self.buffer.is_empty():
                 mb_x = torch.cat([x, buff_x], dim=0)
@@ -361,31 +373,28 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
 
     def before_update(self, mb_x, mb_output, mb_y):
-        '''This should not be needed
-        # Check if new classes are observed
-        curr_classes = set(strategy.experience.classes_in_this_experience)
-        new_classes = curr_classes - self.known_classes    
-        if new_classes:
-            self.known_classes.update(curr_classes)
-        '''
 
+        #Create layer collection
+        lc = None
+        if self.ng_only_last:
+            lc = LayerCollection()
+            lc.add_layer_from_model(self.model, self.model.regressor)
 
-        #Compute the weights for the FIM to compensate for different classes frequencies
-        batch_size = int(mb_x.size(0))
-        weights = torch.ones(batch_size, device=self.device)
-        '''This should not be needed
-        n_known = len(self.known_classes)
-        if len(self.buffer_idx) == len(weights):
-            #######WARNING, MODIFIED FOR CLEAR########
-            if self.iterations % strategy.train_epochs == 0:
-                weights[self.buffer_idx] = self.n_new 
-                self.n_new = self.n_new + strategy.train_epochs * self.regul
-        '''
-
-        if self.tau == 0:
-            self.tau = self.opt.param_groups[0]['lr']
+        #Update FIM condition (trigger if current loss is worst 5%)
+        loss_a = 0.01
+        if self.loss_mean == 0.0:
+            self.loss_mean = self.loss
+            self.loss_sq_mean = self.loss**2
+        self.loss_mean = (1 - loss_a) * self.loss_mean + loss_a * self.loss
+        self.loss_sq_mean = (1 - loss_a) * self.loss_sq_mean + loss_a * self.loss**2            
+        loss_std = np.sqrt(self.loss_sq_mean - self.loss_mean**2)
+        if self.loss > self.loss_mean + self.z * loss_std or self.iterations % self.freq == 0:
+            update_fim = True
+            self.tau = self.regul
         else:
-            self.tau = self.tau + self.regul
+            update_fim = False   
+            self.tau += (1-self.regul)/self.freq
+        
 
         #Create a temporary dataloader to compute the FIM
         temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
@@ -399,7 +408,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         #if mb_output.size(1) != self.output_size:
         #    self.iterations = 0
         
-        if self.iterations % self.freq == 0:
+        if update_fim:
             #Compute and update the FIM
             # FIM must not compute the gradients
             #with torch.no_grad():
@@ -409,7 +418,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     n_output=mb_output.size(1),
                     variant=self.variant, 
                     device=self.device,
-                    lambda_=self.lambda_)
+                    lambda_=self.lambda_,
+                    new_idxs=[0],
+                    deg_f = self.deg_f,
+                    layer_collection=lc,
+                    scale = self.scale,)
 
             #Update the EMA of the FIM
             if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
@@ -417,7 +430,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
             else:
                 self.F_ema = self.EMA_kfac(self.F_ema, F)
             id_last = list(self.F_ema.data.keys())[-1]
-            self.F_ema_inv = self.F_ema.inverse(id_last=id_last, regul = self.regul, regul_last=self.regul_last)
+            self.F_ema_inv = self.F_ema.inverse(id_last=id_last, regul = self.tau, regul_last=self.tau)
 
         self.iterations += 1
 
@@ -426,17 +439,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
             if old_diag is not None:
                 self.F_ema = self.EMA_diag(old_diag, self.F_ema)
 
-        #original_last_known = torch.norm(strategy.model.linear.classifier.weight.grad[list(self.known_classes), :].flatten())
-        #original_last_new = torch.norm(strategy.model.linear.classifier.weight.grad[list(new_classes), :].flatten())
-
-        #Size of the output layer
-        self.output_size = mb_output.size(1)
-
-
         #Compute the regularized gradient
-        original_grad_vec = PVector.from_model_grad(self.model)
+        original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)
         regularized_grad = self.F_ema_inv.mv(original_grad_vec)
         regularized_grad.to_model_grad(self.model)
+
 
     def EMA_kfac(self, mat_old, mat_new):
         """
@@ -505,3 +512,108 @@ class Exp_TS2VecSupervised(Exp_Basic):
         mat_new.data = (mat_new.data[0], new)
 
         return mat_new
+    
+
+
+    def before_update_temp(self, mb_x, mb_output, mb_y):
+
+        #Try different scales, reguls and deg_f
+        for regul in [0.1, 1]:
+                    for i in range(1, 1000):
+                        try:
+                            self.regul = regul
+                            self.scale = 1.0
+                            #Randomize the input and the target keeping the same shape
+                            def sample_k_loguniform(n, k_min=1e-2, k_max=1e4):
+                                log_k = np.random.uniform(np.log(k_min), np.log(k_max), size=n)
+                                return np.exp(log_k)
+                            k, k1 = sample_k_loguniform(2)
+                            mb_x = k*torch.randn_like(mb_x)
+                            mb_y = k1*torch.randn_like(mb_y)
+
+                            #initialize the weights with xavier
+                            for m in self.model.modules():
+                                if isinstance(m, nn.Linear):
+                                    nn.init.xavier_uniform_(m.weight)
+                                    if m.bias is not None:
+                                        nn.init.zeros_(m.bias)
+                            #Set the model to training mode
+                            self.model.train()
+                            #Set the model to the device
+                            self.model.to(self.device)
+
+
+                            #Forward and backward pass
+                            self.model.zero_grad()
+                            mb_output = self.model(mb_x)
+                            criterion = StudentTLoss(nu=self.deg_f, scale= self.scale, reduction='mean')
+                            loss = criterion(mb_output, mb_y)
+                            loss.backward()
+
+
+                            #Create layer collection
+                            lc = None
+                            if self.ng_only_last:
+                                lc = LayerCollection()
+                                lc.add_layer_from_model(self.model, self.model.regressor)
+
+
+                            #Create a temporary dataloader to compute the FIM
+                            temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
+                            temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
+
+                            
+                            if self.iterations % self.freq == 0:
+                                F = FIM(model=self.model,
+                                        loader=temp_dataloader,
+                                        representation=self.representation,
+                                        n_output=mb_output.size(1),
+                                        variant=self.variant, 
+                                        device=self.device,
+                                        lambda_=self.lambda_,
+                                        new_idxs=[0],
+                                        deg_f = self.deg_f,
+                                        layer_collection=lc,
+                                        scale = self.scale)
+
+                                self.F_ema = F
+                                id_last = list(self.F_ema.data.keys())[-1]
+                                self.F_ema_inv = self.F_ema.inverse(id_last=id_last, regul = self.regul, regul_last=self.regul)
+
+                            self.iterations += 1
+
+                            #Size of the output layer
+                            self.output_size = mb_output.size(1)
+
+
+                            #Compute the regularized gradient
+                            original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)
+                            regularized_grad = self.F_ema_inv.mv(original_grad_vec)
+                            regularized_grad.to_model_grad(self.model)
+
+                            
+                            #Compute the norms 
+                            orig_norm = torch.norm(original_grad_vec.get_flat_representation()).item()
+                            reg_norm = torch.norm(regularized_grad.get_flat_representation()).item()
+                            target_norm = torch.norm(mb_y).item()
+                            input_norm = torch.norm(mb_x).item()
+                            new_input_norm = torch.norm(mb_x[0]).item()
+                            old_input_norm = torch.norm(mb_x[1:]).item()
+                            m   = self.output_size
+                            v   = self.deg_f
+                            tau = self.regul
+                            bound_norm = (np.sqrt(m) / 4.0) * np.sqrt((v + 1) * (v + 3) / (v * tau))
+                            #Store the original gradient and the regularized gradient norm history in a csv file
+                            history_path = './grad_norm_history.csv'
+                            file_exists  = os.path.isfile(history_path)
+
+                            # Write header once, then append each row: iteration, orig, reg
+                            with open(history_path, 'a', newline='') as fp:
+                                writer = csv.writer(fp)
+                                if not file_exists:
+                                    writer.writerow(['iteration', 'original_grad_norm', 'regularized_grad_norm', 'target_norm', 'input_norm', 'new_input_norm', 'old_input_norm', 'bound_norm', 'scale', 'regul', 'deg_f'])
+                                writer.writerow([self.iterations, orig_norm, reg_norm, target_norm, input_norm, new_input_norm, old_input_norm, bound_norm, self.scale, self.regul, self.deg_f])
+                        except Exception as e:
+                            print("Error: ", e)
+        #Kill the process with an error
+        assert False, "Error: Process killed to avoid infinite loop"

@@ -32,27 +32,33 @@ def online_hpo(args, exp, setting, best_model_path):
 
     # Define the hyperparameter search space.
     search_space = {
-        "online_lr": tune.loguniform(1e-10, 1e-2),
-        "OCAR_regul" : tune.loguniform(1e-10, 1e-2),
-        "OCAR_regul_last" : tune.loguniform(1e-10, 1e-2),
-        "OCAR_alpha_ema" : tune.uniform(0.0, 1.0),
+        "online_lr": tune.loguniform(1e-4, 1e-1),
+        #"OCAR_regul" : tune.loguniform(1e-2, 1e-0),
+        #"OCAR_regul_last" : tune.loguniform(1e-2, 1e-0),
+        #"OCAR_alpha_ema" : tune.uniform(0.0, 1.0),
     }
 
     def train_function(config):
+        try: 
+            Exp = getattr(importlib.import_module('exp.exp_{}'.format(args.method)), 'Exp_TS2VecSupervised')
+            trial_exp = Exp(args)
 
-        Exp = getattr(importlib.import_module('exp.exp_{}'.format(args.method)), 'Exp_TS2VecSupervised')
-        trial_exp = Exp(args)
+            trial_exp.model.load_state_dict(torch.load(best_model_path))
 
-        trial_exp.model.load_state_dict(torch.load(best_model_path))
+            for key, value in config.items():
+                setattr(args, key, value)
+            
 
-        for key, value in config.items():
-            setattr(args, key, value)
-        
+            metrics, _, _, _, _ = trial_exp.test(setting, data='val')
+            mse = {"mse": metrics[1]}
+            
+            if np.isnan(mse["mse"]):
+                mse["mse"] = 1e10
+        except Exception as e:
+            mse = {"mse": 1e20}
 
-        metrics, _, _, _, _ = trial_exp.test(setting, data='val')
-        mse = {"mse": metrics[1]}
+        tune.report(mse)  
 
-        tune.report(mse)
 
 
     hyperopt_search = HyperOptSearch(metric="mse", mode="min")

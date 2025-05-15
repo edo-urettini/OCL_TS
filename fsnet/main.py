@@ -6,6 +6,7 @@ import numpy as np
 import uuid
 import datetime
 import importlib
+import yaml
 
 from tuning import online_hpo
 from utils.tools import init_dl_program
@@ -90,10 +91,14 @@ parser.add_argument('--finetune', action='store_true', default=False)
 parser.add_argument('--finetune_model_seed', type=int)
 
 #OCAR
-parser.add_argument('--OCAR_regul', type=float, default=1e-3)
-parser.add_argument('--OCAR_regul_last', type=float, default=1e-3)
-parser.add_argument('--OCAR_alpha_ema', type=float, default=1.0)
+parser.add_argument('--OCAR_regul', type=float, default=0.1)
+parser.add_argument('--OCAR_regul_last', type=float, default=0.1)
+parser.add_argument('--OCAR_alpha_ema', type=float, default=0.5)
 parser.add_argument('--online_lr', type=float, default=0.001)
+parser.add_argument('--deg_f' , type=float, default=5, help='degree of freedom')
+parser.add_argument('--ng_only_last', action='store_true', default=False)
+
+parser.add_argument('--online_hpo',  action='store_true', default=False)
 
 args = parser.parse_args()
 
@@ -153,15 +158,23 @@ for ii in range(args.itr):
     _ , best_model_path = exp.train(setting)
 
     #Hyperparameter tuning
-    best_config = online_hpo(args, exp, setting, best_model_path)
+    if args.online_hpo:
+        print('>>>>>>>start online hyperparameter tuning : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+        best_config = online_hpo(args, exp, setting, best_model_path)
+
+    best_config_dir = os.path.join("./best_configs", args.method)
+    os.makedirs(best_config_dir, exist_ok=True)
+    best_config_filename = os.path.join(best_config_dir, "best_config.yaml")
+    with open(best_config_filename) as file:
+        best_config = yaml.safe_load(file)
+    
     for key, value in best_config.items():
         setattr(args, key, value)       
     print('Best config: {}'.format(best_config))
 
     #reset model to best_model_path
+    exp = Exp(args)
     exp.model.load_state_dict(torch.load(best_model_path))
-    
-    
     print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
     m, mae_, mse_, p, t = exp.test(setting)
     metrics.append(m)
