@@ -1,0 +1,169 @@
+Use CPU
+	iters: 100, epoch: 1 | loss: 0.4749215
+	speed: 0.1336s/iter; left time: 159.9154s
+	iters: 200, epoch: 1 | loss: 0.6089759
+	speed: 0.1343s/iter; left time: 147.2903s
+Epoch: 1 cost time: 29.12396001815796
+Epoch: 1, Steps: 216 | Train Loss: 1.0723240 Vali Loss: 0.9327120
+Validation loss decreased (inf --> 0.932712).  Saving model ...
+Updating learning rate to 0.001
+	iters: 100, epoch: 2 | loss: 0.3743561
+	speed: 0.2076s/iter; left time: 203.6644s
+	iters: 200, epoch: 2 | loss: 0.4189099
+	speed: 0.1305s/iter; left time: 114.9538s
+Epoch: 2 cost time: 28.437314748764038
+Epoch: 2, Steps: 216 | Train Loss: 0.3831005 Vali Loss: 0.7822550
+Validation loss decreased (0.932712 --> 0.782255).  Saving model ...
+Updating learning rate to 0.0005
+	iters: 100, epoch: 3 | loss: 0.4299225
+	speed: 0.2086s/iter; left time: 159.6027s
+	iters: 200, epoch: 3 | loss: 0.3262428
+	speed: 0.1387s/iter; left time: 92.2238s
+Epoch: 3 cost time: 29.685837030410767
+Epoch: 3, Steps: 216 | Train Loss: 0.3373506 Vali Loss: 0.7089355
+Validation loss decreased (0.782255 --> 0.708935).  Saving model ...
+Updating learning rate to 0.00025
+	iters: 100, epoch: 4 | loss: 0.2671679
+	speed: 0.2086s/iter; left time: 114.5285s
+	iters: 200, epoch: 4 | loss: 0.2980216
+	speed: 0.1332s/iter; left time: 59.8022s
+Epoch: 4 cost time: 28.820236682891846
+Epoch: 4, Steps: 216 | Train Loss: 0.3171391 Vali Loss: 0.6877934
+Validation loss decreased (0.708935 --> 0.687793).  Saving model ...
+Updating learning rate to 0.000125
+	iters: 100, epoch: 5 | loss: 0.2748998
+	speed: 0.2054s/iter; left time: 68.4046s
+	iters: 200, epoch: 5 | loss: 0.3404393
+	speed: 0.1328s/iter; left time: 30.9477s
+Epoch: 5 cost time: 28.756213665008545
+Epoch: 5, Steps: 216 | Train Loss: 0.3058924 Vali Loss: 0.6113204
+Validation loss decreased (0.687793 --> 0.611320).  Saving model ...
+Updating learning rate to 6.25e-05
+	iters: 100, epoch: 6 | loss: 0.3113493
+	speed: 0.2046s/iter; left time: 23.9330s
+	iters: 200, epoch: 6 | loss: 0.3137624
+	speed: 0.1319s/iter; left time: 2.2416s
+Epoch: 6 cost time: 28.463244915008545
+Epoch: 6, Steps: 216 | Train Loss: 0.3007105 Vali Loss: 0.6315830
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 3.125e-05
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 2, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.30495387577307326, mae:0.36728536066841105, time:754.7421770095825
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 2, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.2409709131184586, mae:0.3200691677568982, time:5248.201612949371
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 2, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.25697358542459564, mae:0.33708038475261654, time:2494.1552131175995
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 2, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.2813525622918649, mae:0.357976183396765, time:616.8855800628662
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 2, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.2864767743518078, mae:0.36237188540675547, time:695.8778569698334
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 8, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.2562203221634158, mae:0.32099492299000953, time:3554.059240102768
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 8, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.22353043604305423, mae:0.30197313942078974, time:1680.413484096527
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 8, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.2541851882136061, mae:0.3347731327307326, time:4342.575773239136
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 8, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.28243774530209326, mae:0.35915274143672693, time:1641.9166042804718
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 8, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.2840800985668411, mae:0.3601234687202664, time:1845.2868819236755
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 16, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.241707079567079, mae:0.3067926565473359, time:4838.714715957642
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 16, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.220930494023549, mae:0.29905019772835395, time:4989.391237974167
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 16, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.2565834064284015, mae:0.33670418054234064, time:8921.352501869202
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 16, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.28327463427687916, mae:0.36017442465509036, time:13341.26235628128
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 16, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.29014974577783065, mae:0.36549655090390104, time:5221.507166147232
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 32, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.2299065436191722, mae:0.29678581782231206, time:15141.059361934662
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 32, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.21776197148549, mae:0.29567558426498575, time:13885.754712104797
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 32, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.2589227893078021, mae:0.33931556999286394, time:15873.443504810333
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 32, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.2866218742566603, mae:0.36190235490009515, time:11200.181034088135
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.001, 'n_replay': 32, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.28486261224429116, mae:0.3606711613939106, time:11468.508413791656
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 2, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.31341757849666985, mae:0.37021486233349193, time:26829.17001080513
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 2, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.2666634269445766, mae:0.3319245064224548, time:22182.939120054245
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 2, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.29825868964081825, mae:0.36266212238344436, time:15498.87279009819
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 2, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3082584294719315, mae:0.36951612303758324, time:12522.701029062271
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 2, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.30943205132017126, mae:0.37068889004519506, time:440.92008996009827
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 8, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.2892276886596099, mae:0.34650366466460514, time:971.0226590633392
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 8, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.25941356074571836, mae:0.32466137161037106, time:1008.7342791557312
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 8, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.29721245762963844, mae:0.3621339423763083, time:1033.3846447467804
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 8, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3079247257076594, mae:0.369536341876784, time:992.4767711162567
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 8, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.30649322074215035, mae:0.36900608051855377, time:980.9454982280731
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 16, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.2785989347942436, mae:0.3362498141650809, time:2954.0505361557007
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 16, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.25930230137963844, mae:0.3244249895932445, time:2163.612268924713
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 16, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.29796670581588963, mae:0.3622455919957184, time:4477.067047119141
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 16, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3066744469552807, mae:0.3686730643434824, time:4082.686399936676
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 16, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.3098465746907707, mae:0.37100246788772595, time:2351.0928118228912
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 32, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.2692834019683635, mae:0.3274166344552807, time:4075.948581933975
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 32, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.2593409178758325, mae:0.32386068327783063, time:8239.169229984283
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 32, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.29891890535799237, mae:0.36348470206945765, time:4362.185741186142
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 32, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3075971359122264, mae:0.36935983587059945, time:3827.1095340251923
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.0001, 'n_replay': 32, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.3090854691960038, mae:0.37040905982397715, time:3773.301318883896
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 2, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.3248240514985728, mae:0.37716401046622267, time:457.4228539466858
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 2, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.30184941053163655, mae:0.35851057029019984, time:440.54755091667175
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 2, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.31779990039248335, mae:0.3718741079923882, time:429.4641327857971
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 2, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3314607739652712, mae:0.38225510674357754, time:474.26783323287964
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 2, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.33757355346098955, mae:0.3865269311964795, time:468.8186740875244
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 8, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.3147565190889629, mae:0.36657376159609895, time:1017.4494631290436
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 8, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.3007786668946242, mae:0.3554109181731684, time:997.2864351272583
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 8, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.3160591847050428, mae:0.3712151002021884, time:1018.3911609649658
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 8, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3324637993577545, mae:0.3827205488820171, time:1053.3120470046997
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 8, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.33751988433634633, mae:0.38650165764747857, time:1083.4396431446075
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 16, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.3129401314224548, mae:0.3652986367150333, time:2237.770604133606
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 16, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.2978730264331589, mae:0.35463386804234065, time:2237.8449680805206
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 16, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.3180113805304472, mae:0.3717468854067555, time:2205.3650319576263
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 16, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.33168942524976214, mae:0.3823840018434824, time:2253.6597950458527
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 16, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.3375752631422455, mae:0.38652722853235016, time:2238.038286924362
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 32, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:0.30822081648430066, mae:0.36053286304709803, time:3955.7595620155334
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 32, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:0.29740894088962894, mae:0.3544708164843007, time:3963.604840040207
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 32, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:0.3180953407469077, mae:0.3717734969671741, time:3954.4179508686066
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 32, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:0.3324325047573739, mae:0.3826814492150333, time:3957.316589832306
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 1e-05, 'n_replay': 32, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:0.3374209458254044, mae:0.3864415586346337, time:3942.414375305176

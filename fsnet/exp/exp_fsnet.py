@@ -6,14 +6,30 @@ import torch
 
 from einops import rearrange
 from utils.metrics import metric, cumavg
-from utils.buffer import Buffer
 
 from .exp_basic import OCLTSExp
 
 
 class FSNetExp(OCLTSExp):
-    def __init__(self, **kwargs):
-        super(FSNetExp, self).__init__(**kwargs)
+    def __init__(
+        self,
+        model_config: dict,
+        data_config: dict,
+        run_config: dict,
+        warm_up_config: dict,
+        tuning_config: dict,
+        # online_config:dict,
+        checkpoint_path: str = "./checkpoints",
+        ):
+
+        super(FSNetExp, self).__init__(
+            model_config,
+            data_config,
+            run_config,
+            warm_up_config,
+            tuning_config,
+            checkpoint_path,
+        )
 
     def _online(self, config: dict, data_loader, use_tqdm: bool = True):
         """

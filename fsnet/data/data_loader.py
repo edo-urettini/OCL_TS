@@ -15,7 +15,8 @@ warnings.filterwarnings('ignore')
 class Dataset_ETT_hour(Dataset):
     def __init__(self, root_path, flag='train', size=None, 
                  features='S', data_path='ETTh1.csv', 
-                 target='OT', scale=True, inverse=False, timeenc=0, freq='h', cols=None):
+                 target='OT', scale=True, inverse=False, timeenc=0, freq='h', cols=None, 
+                 perc_warm_up=0.15, perc_val=0.15):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
@@ -40,6 +41,8 @@ class Dataset_ETT_hour(Dataset):
         
         self.root_path = root_path
         self.data_path = data_path
+        self.perc_warm_up = perc_warm_up
+        self.perc_val = perc_val
         self.__read_data__()
 
     def __read_data__(self):
@@ -49,9 +52,14 @@ class Dataset_ETT_hour(Dataset):
 
         #border1s = [0, 12*30*24 - self.seq_len, 12*30*24+4*30*24 - self.seq_len]
         #border2s = [12*30*24, 12*30*24+4*30*24, 12*30*24+8*30*24]
-        border1s = [0, 4*30*24 - self.seq_len, 5*30*24 - self.seq_len]
-        border2s = [4*30*24, 5*30*24, 20*30*24]
+        #border1s = [0, 4*30*24 - self.seq_len, 5*30*24 - self.seq_len]
+        #border2s = [4*30*24, 5*30*24, 20*30*24]
         
+        num_warm_up = int(len(df_raw) * self.perc_warm_up)
+        num_test = int(len(df_raw) * (1 - self.perc_warm_up - self.perc_val))
+        num_vali = len(df_raw) - num_warm_up - num_test
+        border1s = [0, num_warm_up - self.seq_len, len(df_raw) - num_test - self.seq_len]
+        border2s = [num_warm_up, num_warm_up + num_vali, len(df_raw)]
 
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
@@ -230,7 +238,7 @@ class Dataset_Custom(Dataset):
                  freq='h', 
                  cols=None,
                  perc_warm_up=0.15,
-                 perc_val=0.15):
+                 perc_val=0.35):
         
         # size [seq_len, label_len, pred_len]
         # info

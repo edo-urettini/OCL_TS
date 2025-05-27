@@ -40,6 +40,7 @@ class OCLTSExp:
         tuning_config: dict,
         # online_config:dict,
         checkpoint_path: str = "./checkpoints",
+        best_model_filename: str = "best_model.pth",
     ):
 
         self.model_config = model_config
@@ -52,7 +53,8 @@ class OCLTSExp:
         self.checkpoint_path = checkpoint_path
         if not os.path.exists(checkpoint_path):
             os.makedirs(checkpoint_path)
-        self.best_model_path = os.path.join(checkpoint_path, "checkpoint.pth")
+        self.best_model_filename = best_model_filename
+        self.best_model_path = os.path.join(checkpoint_path, best_model_filename)
 
         self.device = self._acquire_device()
 
@@ -69,8 +71,8 @@ class OCLTSExp:
         self.model.to(self.device)
 
         self.criterion = nn.MSELoss()
+        self.warm_up_lr = self.warm_up_config["learning_rate"]
         self.opt = self._select_optimizer(lr=self.warm_up_config["learning_rate"])
-
         self.best_results = None
         self.best_hyperparameter_config = None
 
@@ -83,10 +85,10 @@ class OCLTSExp:
             )
             device = torch.device("cuda:{}".format(self.run_config["gpu"]))
             print("Use GPU: cuda:{}".format(self.run_config["gpu"]))
-        elif torch.backends.mps.is_available():
-            # for MAC
-            device = torch.device("mps")
-            print("Use MPS")
+        # elif torch.backends.mps.is_available():
+        #     # for MAC
+        #     device = torch.device("mps")
+        #     print("Use MPS")
         else:
             device = torch.device("cpu")
             print("Use CPU")
@@ -121,12 +123,12 @@ class OCLTSExp:
             drop_last = False
             batch_size = args["batch_size"]
             freq = args["detail_freq"]
-        elif flag == "pred":
-            shuffle_flag = False
-            drop_last = False
-            batch_size = 1
-            freq = args["detail_freq"]
-            Data = Dataset_Pred
+        # elif flag == "pred":
+        #     shuffle_flag = False
+        #     drop_last = False
+        #     batch_size = 1
+        #     freq = args["detail_freq"]
+        #     Data = Dataset_Pred
         else:
             shuffle_flag = True
             drop_last = True
@@ -166,7 +168,7 @@ class OCLTSExp:
         Warm up the model with the given configuration.
         """
 
-        train_data, train_loader = self._get_data(flag="train")
+        train_data, train_loader = self._get_data(flag="train", seed_worker=seed_worker, generator=generator)
         val_data, val_loader = self._get_data(flag="val")
 
         time_now = time.time()
@@ -175,6 +177,8 @@ class OCLTSExp:
         early_stopping = EarlyStopping(
             patience=self.warm_up_config["patience"], verbose=True
         )
+
+        self.opt = self._select_optimizer(lr=self.warm_up_lr)
 
         for epoch in range(self.warm_up_config["train_epochs"]):
             iter_count = 0
@@ -192,7 +196,7 @@ class OCLTSExp:
                 pred = self.model(batch_x, batch_x_mark)
                 f_dim = -1 if self.data_config["features"] == "MS" else 0
                 batch_y = (
-                    batch_y[:, -self.data_config["pred_len"] :, f_dim:]
+                    batch_y[:, -self.data_config["pred_len"]:, f_dim:]
                     .float()
                     .to(self.device)
                 )
@@ -220,6 +224,10 @@ class OCLTSExp:
                     )
                     iter_count = 0
                     time_now = time.time()
+                try:
+                    self.model.store_grad()
+                except AttributeError:
+                    pass
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
@@ -247,7 +255,7 @@ class OCLTSExp:
                 )
             )
             # early stop
-            early_stopping(val_loss, self.model, self.checkpoint_path)
+            early_stopping(val_loss, self.model, self.checkpoint_path, self.best_model_filename)
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
@@ -256,7 +264,7 @@ class OCLTSExp:
 
         self.model.load_state_dict(torch.load(self.best_model_path))
 
-        return
+        return self.model
 
     def _get_search_space(self):
         """
@@ -286,8 +294,10 @@ class OCLTSExp:
         """
         Tune the model with for the best online hyperparameters configuration.
         """
-
-        ray.init()
+        # close some open ray instances
+        ray.shutdown()
+        # start a new ray instance
+        ray.init(ignore_reinit_error=True)
 
         search_space = self._get_search_space()
 
@@ -298,6 +308,7 @@ class OCLTSExp:
 
             # Load the best model from warm up
             self.model.load_state_dict(torch.load(self.best_model_path))
+            self.model.eval()
 
             [mae, mse, rmse, mape, mspe, exp_time], MAE, MSE, preds, trues = (
                 self.online(config=config, flag="val", use_tqdm=False)
@@ -324,7 +335,7 @@ class OCLTSExp:
             metric="mse", mode="min"
         ).config
 
-        return
+        return self.best_results, self.best_hyperparameter_config
 
     def online(
         self,
@@ -355,7 +366,7 @@ class OCLTSExp:
         # Load the data
         _, data_loader = self._get_data(flag=flag)
 
-        self.model.train()
+        self.model.eval()
 
         return self._online(config, data_loader, use_tqdm=use_tqdm)
 

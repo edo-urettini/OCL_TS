@@ -6,12 +6,18 @@ from exp.exp_er import ExperienceReplayExp
 from exp.exp_fsnet import FSNetExp
 from exp.exp_naive import NaiveExp
 
+import torch
+import random
+import numpy as np
 
-from utils.reproducibility import set_seed, seed_worker, get_dataloader_seed_generator
-
-SEED, SEED_DL = 123, 42
-set_seed(SEED)
-generator = get_dataloader_seed_generator(SEED_DL)
+seed = 42
+gen_for_data_loader = torch.Generator()
+gen_for_data_loader.manual_seed(seed)
+random.seed(seed)
+seed += 1
+np.random.seed(seed)
+seed += 1
+torch.manual_seed(seed)
 
 
 def prepare_config(experience_strategy: str, main_config_path: str):
@@ -114,8 +120,10 @@ def prepare_config(experience_strategy: str, main_config_path: str):
 
 def main():
 
-    EXPERIENCE_STRATEGY = "naive"  # alternatives: 'fsnet', 'er', 'naive'
-    MAIN_CONFIG_PATH = "/Users/platypus/Desktop/OCL_TS/fsnet"
+    EXPERIENCE_STRATEGY = "er"  # alternatives: 'fsnet', 'er', 'naive'
+    MAIN_CONFIG_PATH = "/Users/platypus/Desktop/OCL_TS/fsnet/configs"
+    TUNE_HYPERPARAMETERS = False    # alternatives: True, False
+    
     exp_class, config = prepare_config(EXPERIENCE_STRATEGY, MAIN_CONFIG_PATH)
 
     exp = exp_class(
@@ -128,17 +136,23 @@ def main():
         checkpoint_path=config["checkpoint_path"],
     )
 
-    exp.warm_up(seed_worker=seed_worker, generator=generator)
+    exp.warm_up(generator=gen_for_data_loader)
     # here the experiment has a model trained and saved in
     # self.checkpoint_path
 
-    exp.tune_hyperparameters(seed_worker=seed_worker, generator=generator)
-    # here the experiment has the results from the tuning in
-    # self.best_results and self.best_hyperparameter_config
+    if TUNE_HYPERPARAMETERS:
+        best_results, best_hyperparameter_config = exp.tune_hyperparameters(generator=gen_for_data_loader)
+        # save into csv
+        best_results.get_dataframe().to_csv("output_er.csv", index=False)
+        # here the experiment has the results from the tuning in
+        # self.best_results and self.best_hyperparameter_config
+    else:
+        for k, v in config["tuning"].items():
+            pass
+            #assert type(v) != dict, f"Hyperparameter {k} is a dict, please change it or use hyperparameter tuning"
+        best_hyperparameter_config = config["tuning"]
 
-    [mae, mse, rmse, mape, mspe, exp_time], MAE, MSE, preds, trues = exp.online(
-        seed_worker=seed_worker, generator=generator
-    )
+    [mae, mse, rmse, mape, mspe, exp_time], MAE, MSE, preds, trues = exp.online(config=best_hyperparameter_config, generator=gen_for_data_loader)
     # we can also call this passing the best configuration and the best model as parameters
 
 

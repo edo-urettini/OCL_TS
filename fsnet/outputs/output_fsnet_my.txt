@@ -1,0 +1,1028 @@
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_6fb3a15e result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                        10.215 │
+│ time_total_s                            10.215 │
+│ training_iteration                           1 │
+│ mse                                    1.66832 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22449) mse:1.6683210208092207, mae:0.959100040388696, time:10.03928804397583
+
+Trial obj_function_095692d2 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_095692d2 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_f050bdca completed after 1 iterations at 2025-05-15 18:22:49. Total running time: 53s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_f050bdca result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.2389 │
+│ time_total_s                           10.2389 │
+│ training_iteration                           1 │
+│ mse                                    1.66982 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22452) mse:1.6698167588975694, mae:0.959721600567853, time:10.080998182296753
+
+Trial obj_function_92829a8c started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_92829a8c config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_cd5ac1c1 completed after 1 iterations at 2025-05-15 18:22:52. Total running time: 57s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_cd5ac1c1 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.83822 │
+│ time_total_s                           9.83822 │
+│ training_iteration                           1 │
+│ mse                                    1.66799 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22460) mse:1.6679872112509646, mae:0.9592366159698109, time:9.660841941833496
+
+Trial obj_function_f3d39431 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_f3d39431 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_095692d2 completed after 1 iterations at 2025-05-15 18:22:56. Total running time: 1min 1s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_095692d2 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.67036 │
+│ time_total_s                           9.67036 │
+│ training_iteration                           1 │
+│ mse                                    1.67426 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22481) mse:1.674256878134645, mae:0.9609130105854552, time:9.455088138580322
+
+Trial status: 13 TERMINATED | 2 RUNNING | 1 PENDING
+Current time: 2025-05-15 18:22:56. Total running time: 1min 1s
+Logical resource usage: 3.0/10 CPUs, 0/0 GPUs
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Trial name              status         n_inner     num_samples     ...concurrent_trials     learning_rate     iter     total time (s)       mse │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ obj_function_92829a8c   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_f3d39431   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_d69705a0   TERMINATED           1              50                       10            0.0001        1           11.0065    1.67215 │
+│ obj_function_357c7758   TERMINATED           1              50                       10            0.0001        1           11.3337    1.67154 │
+│ obj_function_21d25862   TERMINATED           1              50                       10            0.0001        1           11.6944    1.67459 │
+│ obj_function_1761b0bb   TERMINATED           1              50                       10            0.0001        1           12.2323    1.66776 │
+│ obj_function_2c172cf6   TERMINATED           1              50                       10            0.0001        1           10.9538    1.67202 │
+│ obj_function_e69fea16   TERMINATED           1              50                       10            0.0001        1           10.5552    1.66992 │
+│ obj_function_5cbb1376   TERMINATED           1              50                       10            0.0001        1            9.92611   1.67523 │
+│ obj_function_a5b1e56f   TERMINATED           1              50                       10            0.0001        1            9.85104   1.67158 │
+│ obj_function_7e915766   TERMINATED           1              50                       10            0.0001        1            9.70884   1.66844 │
+│ obj_function_6fb3a15e   TERMINATED           1              50                       10            0.0001        1           10.215     1.66832 │
+│ obj_function_f050bdca   TERMINATED           1              50                       10            0.0001        1           10.2389    1.66982 │
+│ obj_function_cd5ac1c1   TERMINATED           1              50                       10            0.0001        1            9.83822   1.66799 │
+│ obj_function_095692d2   TERMINATED           1              50                       10            0.0001        1            9.67036   1.67426 │
+│ obj_function_ddfa5fa5   PENDING              1              50                       10            0.0001                                       │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+Trial obj_function_ddfa5fa5 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_ddfa5fa5 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+(obj_function pid=22490) mse:1.672843462155189, mae:0.9603372267734858, time:10.1312837600708
+
+Trial obj_function_92829a8c completed after 1 iterations at 2025-05-15 18:23:00. Total running time: 1min 5s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_92829a8c result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                        10.293 │
+│ time_total_s                            10.293 │
+│ training_iteration                           1 │
+│ mse                                    1.67284 │
+╰────────────────────────────────────────────────╯
+
+Trial obj_function_d8aec2b0 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_d8aec2b0 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_f3d39431 completed after 1 iterations at 2025-05-15 18:23:03. Total running time: 1min 8s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_f3d39431 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.6613 │
+│ time_total_s                           10.6613 │
+│ training_iteration                           1 │
+│ mse                                    1.67301 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22501) mse:1.6730052806712963, mae:0.9608224939416956, time:10.504996061325073
+
+Trial obj_function_a282fdfb started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_a282fdfb config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_ddfa5fa5 completed after 1 iterations at 2025-05-15 18:23:07. Total running time: 1min 12s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_ddfa5fa5 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.4626 │
+│ time_total_s                           10.4626 │
+│ training_iteration                           1 │
+│ mse                                    1.66771 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22503) mse:1.667710104106385, mae:0.9591420491536459, time:10.306313037872314
+
+Trial obj_function_35cc7dd4 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_35cc7dd4 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_d8aec2b0 completed after 1 iterations at 2025-05-15 18:23:11. Total running time: 1min 16s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_d8aec2b0 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.3266 │
+│ time_total_s                           10.3266 │
+│ training_iteration                           1 │
+│ mse                                    1.66954 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22506) mse:1.6695398401331019, mae:0.959287949550299, time:10.103429079055786
+
+Trial obj_function_c5d6c32c started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_c5d6c32c config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_a282fdfb completed after 1 iterations at 2025-05-15 18:23:15. Total running time: 1min 20s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_a282fdfb result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.4917 │
+│ time_total_s                           10.4917 │
+│ training_iteration                           1 │
+│ mse                                    1.66895 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22516) mse:1.6689526593243633, mae:0.9596643330138407, time:10.324338912963867
+
+Trial obj_function_6a171e53 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_6a171e53 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_35cc7dd4 completed after 1 iterations at 2025-05-15 18:23:18. Total running time: 1min 23s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_35cc7dd4 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.5628 │
+│ time_total_s                           10.5628 │
+│ training_iteration                           1 │
+│ mse                                    1.67267 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22519) mse:1.6726744851948303, mae:0.9604096589265047, time:10.412689685821533
+
+Trial obj_function_d63a6d27 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_d63a6d27 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_c5d6c32c completed after 1 iterations at 2025-05-15 18:23:22. Total running time: 1min 26s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_c5d6c32c result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.81793 │
+│ time_total_s                           9.81793 │
+│ training_iteration                           1 │
+│ mse                                    1.67084 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22520) mse:1.6708426769868827, mae:0.9594974282347126, time:9.579230070114136
+
+Trial obj_function_f87dd533 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_f87dd533 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_6a171e53 completed after 1 iterations at 2025-05-15 18:23:25. Total running time: 1min 30s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_6a171e53 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.42654 │
+│ time_total_s                           9.42654 │
+│ training_iteration                           1 │
+│ mse                                     1.6678 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22523) mse:1.667795251916956, mae:0.9588406409746335, time:9.22712779045105
+
+Trial obj_function_c61b7d37 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_c61b7d37 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial status: 21 TERMINATED | 3 RUNNING | 1 PENDING
+Current time: 2025-05-15 18:23:27. Total running time: 1min 31s
+Logical resource usage: 4.0/10 CPUs, 0/0 GPUs
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Trial name              status         n_inner     num_samples     ...concurrent_trials     learning_rate     iter     total time (s)       mse │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ obj_function_d63a6d27   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_f87dd533   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_c61b7d37   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_d69705a0   TERMINATED           1              50                       10            0.0001        1            11.0065   1.67215 │
+│ obj_function_357c7758   TERMINATED           1              50                       10            0.0001        1            11.3337   1.67154 │
+│ obj_function_21d25862   TERMINATED           1              50                       10            0.0001        1            11.6944   1.67459 │
+│ obj_function_1761b0bb   TERMINATED           1              50                       10            0.0001        1            12.2323   1.66776 │
+│ obj_function_2c172cf6   TERMINATED           1              50                       10            0.0001        1            10.9538   1.67202 │
+│ obj_function_7170c877   PENDING              1              50                       10            0.0001                                       │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+16 more TERMINATED
+
+Trial obj_function_d63a6d27 completed after 1 iterations at 2025-05-15 18:23:29. Total running time: 1min 34s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_d63a6d27 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.83008 │
+│ time_total_s                           9.83008 │
+│ training_iteration                           1 │
+│ mse                                    1.67288 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22531) mse:1.672882268458237, mae:0.9604269898967979, time:9.677636861801147
+
+Trial obj_function_7170c877 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_7170c877 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_f87dd533 completed after 1 iterations at 2025-05-15 18:23:32. Total running time: 1min 37s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_f87dd533 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.96046 │
+│ time_total_s                           9.96046 │
+│ training_iteration                           1 │
+│ mse                                    1.66998 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22535) mse:1.6699751865716628, mae:0.9593179961781443, time:9.804683923721313
+
+Trial obj_function_f851c3fc started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_f851c3fc config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+(obj_function pid=22538) mse:1.6706763373480902, mae:0.9593733799310378, time:9.70912480354309
+
+Trial obj_function_c61b7d37 completed after 1 iterations at 2025-05-15 18:23:35. Total running time: 1min 40s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_c61b7d37 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.86282 │
+│ time_total_s                           9.86282 │
+│ training_iteration                           1 │
+│ mse                                    1.67068 │
+╰────────────────────────────────────────────────╯
+
+Trial obj_function_2fc3ca9f started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_2fc3ca9f config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+(obj_function pid=22541) mse:1.6661638801480516, mae:0.9592248422128183, time:9.389067888259888
+
+Trial obj_function_7170c877 completed after 1 iterations at 2025-05-15 18:23:39. Total running time: 1min 44s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_7170c877 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.60338 │
+│ time_total_s                           9.60338 │
+│ training_iteration                           1 │
+│ mse                                    1.66616 │
+╰────────────────────────────────────────────────╯
+
+Trial obj_function_738827c6 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_738827c6 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_f851c3fc completed after 1 iterations at 2025-05-15 18:23:43. Total running time: 1min 47s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_f851c3fc result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.64946 │
+│ time_total_s                           9.64946 │
+│ training_iteration                           1 │
+│ mse                                    1.66983 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22555) mse:1.6698312641661843, mae:0.9597043637876157, time:9.467761993408203
+
+Trial obj_function_a0eb1f44 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_a0eb1f44 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_2fc3ca9f completed after 1 iterations at 2025-05-15 18:23:46. Total running time: 1min 51s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_2fc3ca9f result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.84686 │
+│ time_total_s                           9.84686 │
+│ training_iteration                           1 │
+│ mse                                    1.66834 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22556) mse:1.668336467978395, mae:0.9591428968641493, time:9.686217069625854
+
+Trial obj_function_b05576c5 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_b05576c5 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+(obj_function pid=22567) mse:1.6702165014949846, mae:0.959817956995081, time:9.450082063674927
+
+Trial obj_function_738827c6 completed after 1 iterations at 2025-05-15 18:23:49. Total running time: 1min 54s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_738827c6 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.61096 │
+│ time_total_s                           9.61096 │
+│ training_iteration                           1 │
+│ mse                                    1.67022 │
+╰────────────────────────────────────────────────╯
+
+Trial obj_function_19ee762d started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_19ee762d config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_a0eb1f44 completed after 1 iterations at 2025-05-15 18:23:53. Total running time: 1min 58s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_a0eb1f44 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.43782 │
+│ time_total_s                           9.43782 │
+│ training_iteration                           1 │
+│ mse                                     1.6661 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22593) mse:1.666102468231578, mae:0.9583624380606192, time:9.280438661575317
+
+Trial obj_function_b2b63e0a started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_b2b63e0a config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_b05576c5 completed after 1 iterations at 2025-05-15 18:23:57. Total running time: 2min 1s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_b05576c5 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.81932 │
+│ time_total_s                           9.81932 │
+│ training_iteration                           1 │
+│ mse                                    1.66987 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22616) mse:1.669865737726659, mae:0.9594000357168692, time:9.664759874343872
+
+Trial status: 30 TERMINATED | 2 RUNNING | 1 PENDING
+Current time: 2025-05-15 18:23:57. Total running time: 2min 2s
+Logical resource usage: 3.0/10 CPUs, 0/0 GPUs
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Trial name              status         n_inner     num_samples     ...concurrent_trials     learning_rate     iter     total time (s)       mse │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ obj_function_19ee762d   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_b2b63e0a   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_d69705a0   TERMINATED           1              50                       10            0.0001        1            11.0065   1.67215 │
+│ obj_function_357c7758   TERMINATED           1              50                       10            0.0001        1            11.3337   1.67154 │
+│ obj_function_21d25862   TERMINATED           1              50                       10            0.0001        1            11.6944   1.67459 │
+│ obj_function_1761b0bb   TERMINATED           1              50                       10            0.0001        1            12.2323   1.66776 │
+│ obj_function_2c172cf6   TERMINATED           1              50                       10            0.0001        1            10.9538   1.67202 │
+│ obj_function_59c43f16   PENDING              1              50                       10            0.0001                                       │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+25 more TERMINATED
+
+Trial obj_function_59c43f16 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_59c43f16 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_19ee762d completed after 1 iterations at 2025-05-15 18:24:01. Total running time: 2min 6s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_19ee762d result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.7887 │
+│ time_total_s                           10.7887 │
+│ training_iteration                           1 │
+│ mse                                     1.6697 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22619) mse:1.6696973259066359, mae:0.9595408498505016, time:10.6249520778656
+
+Trial obj_function_9159ccb6 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_9159ccb6 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_b2b63e0a completed after 1 iterations at 2025-05-15 18:24:04. Total running time: 2min 9s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_b2b63e0a result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.8785 │
+│ time_total_s                           10.8785 │
+│ training_iteration                           1 │
+│ mse                                    1.67093 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22626) mse:1.67093046211902, mae:0.9596561384789738, time:10.721085786819458
+
+Trial obj_function_74b45717 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_74b45717 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_59c43f16 completed after 1 iterations at 2025-05-15 18:24:08. Total running time: 2min 13s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_59c43f16 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.85372 │
+│ time_total_s                           9.85372 │
+│ training_iteration                           1 │
+│ mse                                    1.66807 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22637) mse:1.6680736777223186, mae:0.9591953607253086, time:9.631876230239868
+
+Trial obj_function_74c3c1bc started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_74c3c1bc config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_9159ccb6 completed after 1 iterations at 2025-05-15 18:24:12. Total running time: 2min 16s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_9159ccb6 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.50995 │
+│ time_total_s                           9.50995 │
+│ training_iteration                           1 │
+│ mse                                    1.67075 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22646) mse:1.6707467915099343, mae:0.9599889119466146, time:9.293979167938232
+
+Trial obj_function_18b7d76c started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_18b7d76c config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_74b45717 completed after 1 iterations at 2025-05-15 18:24:15. Total running time: 2min 20s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_74b45717 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.65092 │
+│ time_total_s                           9.65092 │
+│ training_iteration                           1 │
+│ mse                                    1.67092 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22651) mse:1.6709167103708527, mae:0.9595138173044464, time:9.495481014251709
+
+Trial obj_function_13803125 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_13803125 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_74c3c1bc completed after 1 iterations at 2025-05-15 18:24:19. Total running time: 2min 23s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_74c3c1bc result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.49654 │
+│ time_total_s                           9.49654 │
+│ training_iteration                           1 │
+│ mse                                    1.67287 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22661) mse:1.6728700237509646, mae:0.9602880595642843, time:9.340634822845459
+
+Trial obj_function_40f0f870 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_40f0f870 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_18b7d76c completed after 1 iterations at 2025-05-15 18:24:22. Total running time: 2min 27s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_18b7d76c result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.38619 │
+│ time_total_s                           9.38619 │
+│ training_iteration                           1 │
+│ mse                                    1.66834 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22665) mse:1.6683357144579476, mae:0.9586706279236593, time:9.222189903259277
+
+Trial obj_function_0f0046ad started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_0f0046ad config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_13803125 completed after 1 iterations at 2025-05-15 18:24:25. Total running time: 2min 30s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_13803125 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.31759 │
+│ time_total_s                           9.31759 │
+│ training_iteration                           1 │
+│ mse                                    1.66859 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22668) mse:1.6685898392288774, mae:0.9594541008089795, time:9.168691873550415
+
+Trial obj_function_2687ef7d started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_2687ef7d config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial status: 38 TERMINATED | 3 RUNNING | 1 PENDING
+Current time: 2025-05-15 18:24:27. Total running time: 2min 32s
+Logical resource usage: 4.0/10 CPUs, 0/0 GPUs
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Trial name              status         n_inner     num_samples     ...concurrent_trials     learning_rate     iter     total time (s)       mse │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ obj_function_40f0f870   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_0f0046ad   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_2687ef7d   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_d69705a0   TERMINATED           1              50                       10            0.0001        1            11.0065   1.67215 │
+│ obj_function_357c7758   TERMINATED           1              50                       10            0.0001        1            11.3337   1.67154 │
+│ obj_function_21d25862   TERMINATED           1              50                       10            0.0001        1            11.6944   1.67459 │
+│ obj_function_1761b0bb   TERMINATED           1              50                       10            0.0001        1            12.2323   1.66776 │
+│ obj_function_2c172cf6   TERMINATED           1              50                       10            0.0001        1            10.9538   1.67202 │
+│ obj_function_76af4ad9   PENDING              1              50                       10            0.0001                                       │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+33 more TERMINATED
+
+Trial obj_function_40f0f870 completed after 1 iterations at 2025-05-15 18:24:29. Total running time: 2min 34s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_40f0f870 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.41985 │
+│ time_total_s                           9.41985 │
+│ training_iteration                           1 │
+│ mse                                    1.66831 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22673) mse:1.668309152862172, mae:0.9587597317165799, time:9.2623131275177
+
+Trial obj_function_76af4ad9 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_76af4ad9 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+(obj_function pid=22681) mse:1.6704316315827545, mae:0.9596555733386382, time:9.331207752227783
+
+Trial obj_function_0f0046ad completed after 1 iterations at 2025-05-15 18:24:32. Total running time: 2min 37s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_0f0046ad result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.48103 │
+│ time_total_s                           9.48103 │
+│ training_iteration                           1 │
+│ mse                                    1.67043 │
+╰────────────────────────────────────────────────╯
+
+Trial obj_function_c70b1e88 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_c70b1e88 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_2687ef7d completed after 1 iterations at 2025-05-15 18:24:35. Total running time: 2min 40s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_2687ef7d result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.55975 │
+│ time_total_s                           9.55975 │
+│ training_iteration                           1 │
+│ mse                                    1.67008 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22694) mse:1.670084070276331, mae:0.9597460899823977, time:9.405229091644287
+
+Trial obj_function_b15aaee6 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_b15aaee6 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_76af4ad9 completed after 1 iterations at 2025-05-15 18:24:40. Total running time: 2min 45s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_76af4ad9 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.6878 │
+│ time_total_s                           10.6878 │
+│ training_iteration                           1 │
+│ mse                                    1.66763 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22697) mse:1.6676317379798418, mae:0.9589000748999325, time:10.53455901145935
+
+Trial obj_function_7f724207 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_7f724207 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_c70b1e88 completed after 1 iterations at 2025-05-15 18:24:43. Total running time: 2min 48s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_c70b1e88 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       11.0015 │
+│ time_total_s                           11.0015 │
+│ training_iteration                           1 │
+│ mse                                    1.67163 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22701) mse:1.671634061836902, mae:0.9597213179976852, time:10.84818410873413
+
+Trial obj_function_67e4ff3b started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_67e4ff3b config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_b15aaee6 completed after 1 iterations at 2025-05-15 18:24:47. Total running time: 2min 51s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_b15aaee6 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       10.8072 │
+│ time_total_s                           10.8072 │
+│ training_iteration                           1 │
+│ mse                                    1.66802 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22705) mse:1.6680182939694252, mae:0.9595254968713831, time:10.645623207092285
+
+Trial obj_function_328b0c18 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_328b0c18 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_7f724207 completed after 1 iterations at 2025-05-15 18:24:50. Total running time: 2min 55s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_7f724207 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.61696 │
+│ time_total_s                           9.61696 │
+│ training_iteration                           1 │
+│ mse                                     1.6723 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22710) mse:1.6722994203920718, mae:0.9603153746805073, time:9.349032878875732
+
+Trial obj_function_60d913eb started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_60d913eb config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_67e4ff3b completed after 1 iterations at 2025-05-15 18:24:54. Total running time: 2min 58s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_67e4ff3b result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.47301 │
+│ time_total_s                           9.47301 │
+│ training_iteration                           1 │
+│ mse                                    1.66734 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22724) mse:1.6673431396484375, mae:0.9591700236002604, time:9.300257921218872
+
+Trial obj_function_780f6208 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_780f6208 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial status: 46 TERMINATED | 3 RUNNING | 1 PENDING
+Current time: 2025-05-15 18:24:57. Total running time: 3min 2s
+Logical resource usage: 4.0/10 CPUs, 0/0 GPUs
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Trial name              status         n_inner     num_samples     ...concurrent_trials     learning_rate     iter     total time (s)       mse │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ obj_function_328b0c18   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_60d913eb   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_780f6208   RUNNING              1              50                       10            0.0001                                       │
+│ obj_function_d69705a0   TERMINATED           1              50                       10            0.0001        1            11.0065   1.67215 │
+│ obj_function_357c7758   TERMINATED           1              50                       10            0.0001        1            11.3337   1.67154 │
+│ obj_function_21d25862   TERMINATED           1              50                       10            0.0001        1            11.6944   1.67459 │
+│ obj_function_1761b0bb   TERMINATED           1              50                       10            0.0001        1            12.2323   1.66776 │
+│ obj_function_2c172cf6   TERMINATED           1              50                       10            0.0001        1            10.9538   1.67202 │
+│ obj_function_2f8fbbb0   PENDING              1              50                       10            0.0001                                       │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+41 more TERMINATED
+
+Trial obj_function_328b0c18 completed after 1 iterations at 2025-05-15 18:24:57. Total running time: 3min 2s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_328b0c18 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                        9.6055 │
+│ time_total_s                            9.6055 │
+│ training_iteration                           1 │
+│ mse                                    1.66789 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22725) mse:1.6678941514756944, mae:0.9587841269410686, time:9.433250904083252
+
+Trial obj_function_2f8fbbb0 started with configuration:
+╭───────────────────────────────────────────────╮
+│ Trial obj_function_2f8fbbb0 config            │
+├───────────────────────────────────────────────┤
+│ learning_rate                          0.0001 │
+│ max_concurrent_trials                      10 │
+│ n_inner                                     1 │
+│ num_samples                                50 │
+╰───────────────────────────────────────────────╯
+
+Trial obj_function_60d913eb completed after 1 iterations at 2025-05-15 18:25:00. Total running time: 3min 5s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_60d913eb result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.59634 │
+│ time_total_s                           9.59634 │
+│ training_iteration                           1 │
+│ mse                                    1.66878 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22728) mse:1.6687791612413194, mae:0.9594027672284915, time:9.438361167907715
+
+Trial obj_function_780f6208 completed after 1 iterations at 2025-05-15 18:25:04. Total running time: 3min 8s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_780f6208 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.37468 │
+│ time_total_s                           9.37468 │
+│ training_iteration                           1 │
+│ mse                                    1.67049 │
+╰────────────────────────────────────────────────╯
+(obj_function pid=22731) mse:1.67048720371576, mae:0.9603870533130787, time:9.211419105529785
+
+Trial obj_function_2f8fbbb0 completed after 1 iterations at 2025-05-15 18:25:07. Total running time: 3min 12s
+╭────────────────────────────────────────────────╮
+│ Trial obj_function_2f8fbbb0 result             │
+├────────────────────────────────────────────────┤
+│ checkpoint_dir_name                            │
+│ time_this_iter_s                       9.13401 │
+│ time_total_s                           9.13401 │
+│ training_iteration                           1 │
+│ mse                                    1.66676 │
+╰────────────────────────────────────────────────╯
+2025-05-15 18:25:07,463 INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to '/Users/platypus/ray_results/obj_function_2025-05-15_18-21-55' in 0.0196s.
+
+Trial status: 50 TERMINATED
+Current time: 2025-05-15 18:25:07. Total running time: 3min 12s
+Logical resource usage: 1.0/10 CPUs, 0/0 GPUs
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Trial name              status         n_inner     num_samples     ...concurrent_trials     learning_rate     iter     total time (s)       mse │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ obj_function_d69705a0   TERMINATED           1              50                       10            0.0001        1           11.0065    1.67215 │
+│ obj_function_357c7758   TERMINATED           1              50                       10            0.0001        1           11.3337    1.67154 │
+│ obj_function_21d25862   TERMINATED           1              50                       10            0.0001        1           11.6944    1.67459 │
+│ obj_function_1761b0bb   TERMINATED           1              50                       10            0.0001        1           12.2323    1.66776 │
+│ obj_function_2c172cf6   TERMINATED           1              50                       10            0.0001        1           10.9538    1.67202 │
+│ obj_function_e69fea16   TERMINATED           1              50                       10            0.0001        1           10.5552    1.66992 │
+│ obj_function_5cbb1376   TERMINATED           1              50                       10            0.0001        1            9.92611   1.67523 │
+│ obj_function_a5b1e56f   TERMINATED           1              50                       10            0.0001        1            9.85104   1.67158 │
+│ obj_function_7e915766   TERMINATED           1              50                       10            0.0001        1            9.70884   1.66844 │
+│ obj_function_6fb3a15e   TERMINATED           1              50                       10            0.0001        1           10.215     1.66832 │
+│ obj_function_f050bdca   TERMINATED           1              50                       10            0.0001        1           10.2389    1.66982 │
+│ obj_function_cd5ac1c1   TERMINATED           1              50                       10            0.0001        1            9.83822   1.66799 │
+│ obj_function_095692d2   TERMINATED           1              50                       10            0.0001        1            9.67036   1.67426 │
+│ obj_function_92829a8c   TERMINATED           1              50                       10            0.0001        1           10.293     1.67284 │
+│ obj_function_f3d39431   TERMINATED           1              50                       10            0.0001        1           10.6613    1.67301 │
+│ obj_function_ddfa5fa5   TERMINATED           1              50                       10            0.0001        1           10.4626    1.66771 │
+│ obj_function_d8aec2b0   TERMINATED           1              50                       10            0.0001        1           10.3266    1.66954 │
+│ obj_function_a282fdfb   TERMINATED           1              50                       10            0.0001        1           10.4917    1.66895 │
+│ obj_function_35cc7dd4   TERMINATED           1              50                       10            0.0001        1           10.5628    1.67267 │
+│ obj_function_c5d6c32c   TERMINATED           1              50                       10            0.0001        1            9.81793   1.67084 │
+│ obj_function_6a171e53   TERMINATED           1              50                       10            0.0001        1            9.42654   1.6678  │
+│ obj_function_d63a6d27   TERMINATED           1              50                       10            0.0001        1            9.83008   1.67288 │
+│ obj_function_f87dd533   TERMINATED           1              50                       10            0.0001        1            9.96046   1.66998 │
+│ obj_function_c61b7d37   TERMINATED           1              50                       10            0.0001        1            9.86282   1.67068 │
+│ obj_function_7170c877   TERMINATED           1              50                       10            0.0001        1            9.60338   1.66616 │
+│ obj_function_f851c3fc   TERMINATED           1              50                       10            0.0001        1            9.64946   1.66983 │
+│ obj_function_2fc3ca9f   TERMINATED           1              50                       10            0.0001        1            9.84686   1.66834 │
+│ obj_function_738827c6   TERMINATED           1              50                       10            0.0001        1            9.61096   1.67022 │
+│ obj_function_a0eb1f44   TERMINATED           1              50                       10            0.0001        1            9.43782   1.6661  │
+│ obj_function_b05576c5   TERMINATED           1              50                       10            0.0001        1            9.81932   1.66987 │
+│ obj_function_19ee762d   TERMINATED           1              50                       10            0.0001        1           10.7887    1.6697  │
+│ obj_function_b2b63e0a   TERMINATED           1              50                       10            0.0001        1           10.8785    1.67093 │
+│ obj_function_59c43f16   TERMINATED           1              50                       10            0.0001        1            9.85372   1.66807 │
+│ obj_function_9159ccb6   TERMINATED           1              50                       10            0.0001        1            9.50995   1.67075 │
+│ obj_function_74b45717   TERMINATED           1              50                       10            0.0001        1            9.65092   1.67092 │
+│ obj_function_74c3c1bc   TERMINATED           1              50                       10            0.0001        1            9.49654   1.67287 │
+│ obj_function_18b7d76c   TERMINATED           1              50                       10            0.0001        1            9.38619   1.66834 │
+│ obj_function_13803125   TERMINATED           1              50                       10            0.0001        1            9.31759   1.66859 │
+│ obj_function_40f0f870   TERMINATED           1              50                       10            0.0001        1            9.41985   1.66831 │
+│ obj_function_0f0046ad   TERMINATED           1              50                       10            0.0001        1            9.48103   1.67043 │
+│ obj_function_2687ef7d   TERMINATED           1              50                       10            0.0001        1            9.55975   1.67008 │
+│ obj_function_76af4ad9   TERMINATED           1              50                       10            0.0001        1           10.6878    1.66763 │
+│ obj_function_c70b1e88   TERMINATED           1              50                       10            0.0001        1           11.0015    1.67163 │
+│ obj_function_b15aaee6   TERMINATED           1              50                       10            0.0001        1           10.8072    1.66802 │
+│ obj_function_7f724207   TERMINATED           1              50                       10            0.0001        1            9.61696   1.6723  │
+│ obj_function_67e4ff3b   TERMINATED           1              50                       10            0.0001        1            9.47301   1.66734 │
+│ obj_function_328b0c18   TERMINATED           1              50                       10            0.0001        1            9.6055    1.66789 │
+│ obj_function_60d913eb   TERMINATED           1              50                       10            0.0001        1            9.59634   1.66878 │
+│ obj_function_780f6208   TERMINATED           1              50                       10            0.0001        1            9.37468   1.67049 │
+│ obj_function_2f8fbbb0   TERMINATED           1              50                       10            0.0001        1            9.13401   1.66676 │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+(obj_function pid=22735) mse:1.666756147219811, mae:0.9588384746033468, time:8.992946863174438
+ 54%|█████████████████████████████████████████████████████████████████████████████████████████████████▉                                                                                    | 6551/12171 [09:24<07:32, 12.42it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 12171/12171 [17:20<00:00, 11.69it/s]
+mse:0.5311462537743407, mae:0.5182261176669953, time:1041.3120121955872

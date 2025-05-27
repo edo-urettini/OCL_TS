@@ -1,0 +1,83 @@
+Use CPU
+	iters: 100, epoch: 1 | loss: 0.4749215
+	speed: 0.1291s/iter; left time: 154.5614s
+	iters: 200, epoch: 1 | loss: 0.6089759
+	speed: 0.1278s/iter; left time: 140.2292s
+Epoch: 1 cost time: 27.746339082717896
+Epoch: 1, Steps: 216 | Train Loss: 1.0723240 Vali Loss: 0.9327120
+Validation loss decreased (inf --> 0.932712).  Saving model ...
+Updating learning rate to 0.001
+	iters: 100, epoch: 2 | loss: 0.3743561
+	speed: 0.1979s/iter; left time: 194.1128s
+	iters: 200, epoch: 2 | loss: 0.4189099
+	speed: 0.1286s/iter; left time: 113.2849s
+Epoch: 2 cost time: 27.725014209747314
+Epoch: 2, Steps: 216 | Train Loss: 0.3831005 Vali Loss: 0.7822550
+Validation loss decreased (0.932712 --> 0.782255).  Saving model ...
+Updating learning rate to 0.0005
+	iters: 100, epoch: 3 | loss: 0.4299225
+	speed: 0.1987s/iter; left time: 152.0263s
+	iters: 200, epoch: 3 | loss: 0.3262428
+	speed: 0.1289s/iter; left time: 85.6918s
+Epoch: 3 cost time: 27.828202962875366
+Epoch: 3, Steps: 216 | Train Loss: 0.3373506 Vali Loss: 0.7089355
+Validation loss decreased (0.782255 --> 0.708935).  Saving model ...
+Updating learning rate to 0.00025
+	iters: 100, epoch: 4 | loss: 0.2671679
+	speed: 0.1997s/iter; left time: 109.6323s
+	iters: 200, epoch: 4 | loss: 0.2980216
+	speed: 0.1292s/iter; left time: 58.0108s
+Epoch: 4 cost time: 28.006697177886963
+Epoch: 4, Steps: 216 | Train Loss: 0.3171391 Vali Loss: 0.6877934
+Validation loss decreased (0.708935 --> 0.687793).  Saving model ...
+Updating learning rate to 0.000125
+	iters: 100, epoch: 5 | loss: 0.2748998
+	speed: 0.2019s/iter; left time: 67.2199s
+	iters: 200, epoch: 5 | loss: 0.3404393
+	speed: 0.1289s/iter; left time: 30.0262s
+Epoch: 5 cost time: 27.957218885421753
+Epoch: 5, Steps: 216 | Train Loss: 0.3058924 Vali Loss: 0.6113204
+Validation loss decreased (0.687793 --> 0.611320).  Saving model ...
+Updating learning rate to 6.25e-05
+	iters: 100, epoch: 6 | loss: 0.3113493
+	speed: 0.1992s/iter; left time: 23.3076s
+	iters: 200, epoch: 6 | loss: 0.3137624
+	speed: 0.1295s/iter; left time: 2.2008s
+Epoch: 6 cost time: 27.921438932418823
+Epoch: 6, Steps: 216 | Train Loss: 0.3007105 Vali Loss: 0.6315830
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 3.125e-05
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 2, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:784834036223637.2, mae:187720.0502378687, time:451.59362721443176
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 2, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:1.2326412115938652e+25, mae:1148872366952.2805, time:402.3785789012909
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 2, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:713284305665037.2, mae:199935.4056707897, time:740.7638199329376
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 2, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:366030663975161.44, mae:955974.2867364414, time:407.8643808364868
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 2, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:1.854338131609434e+16, mae:961689.902036156, time:1386.8724510669708
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 8, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:1.3689309189501012e+25, mae:2010593109952.475, time:3950.0015280246735
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 8, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:5146497111254703.0, mae:2126149.185765937, time:1588.2628772258759
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 8, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:1.3982263972510474e+19, mae:329807062.85488105, time:1629.4176659584045
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 8, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:6.841437476715232e+17, mae:46033309.49724072, time:1657.479033946991
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 8, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:6.650674145106101e+16, mae:2278334.40943863, time:1672.5792198181152
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 16, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:1006120077154.6294, mae:17577.305880114178, time:4994.24911403656
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 16, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:224018076902042.28, mae:404120.55748810654, time:3600.6542840003967
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 16, 'er_loss_weight': 0.1, 'buffer_type': 'reservoir'}
+mse:2496102049343974.0, mae:1317706.6613891532, time:6438.4598300457
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 16, 'er_loss_weight': 0.01, 'buffer_type': 'reservoir'}
+mse:9.801709646091395e+17, mae:23507405.27741199, time:4560.960421085358
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 16, 'er_loss_weight': 0.001, 'buffer_type': 'reservoir'}
+mse:6790307496770.945, mae:36044.73666983825, time:2808.592805147171
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 32, 'er_loss_weight': 10, 'buffer_type': 'reservoir'}
+mse:1.9723707824342346e+18, mae:63591764.50192198, time:5259.482242107391
+{'n_inner': 1, 'num_samples': 100, 'max_concurrent_trials': 5, 'buffer_size': 500, 'learning_rate': 0.01, 'n_replay': 32, 'er_loss_weight': 1, 'buffer_type': 'reservoir'}
+mse:333363367972591.7, mae:462118.3585918173, time:6499.665991067886

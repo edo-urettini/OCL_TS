@@ -43,9 +43,9 @@ class SamePadConv(nn.Module):
         if torch.cuda.is_available():
             self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0).cuda()
             self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0).cuda()
-        elif torch.backends.mps.is_available():
-            self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0).to('mps')
-            self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0).to('mps')
+        # elif torch.backends.mps.is_available():
+        #     self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0).to('mps')
+        #     self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0).to('mps')
         else:
             self.grads = torch.Tensor(sum(self.grad_dim)).fill_(0)
             self.f_grads = torch.Tensor(sum(self.grad_dim)).fill_(0)
@@ -99,8 +99,8 @@ class SamePadConv(nn.Module):
         if not hasattr(self, 'q_ema'):
             if torch.cuda.is_available():
                 setattr(self, 'q_ema', torch.zeros(*q.size()).float().cuda())
-            elif torch.backends.mps.is_available():
-                setattr(self, 'q_ema', torch.zeros(*q.size()).float().to('mps'))
+            # elif torch.backends.mps.is_available():
+            #     setattr(self, 'q_ema', torch.zeros(*q.size()).float().to('mps'))
             else:
                 setattr(self, 'q_ema', torch.zeros(*q.size()).float())
         else:
@@ -121,16 +121,16 @@ class SamePadConv(nn.Module):
             # write memory
             if torch.cuda.is_available():
                 s_att = torch.zeros(att.size(0)).cuda()
-            elif torch.backends.mps.is_available():
-                s_att = torch.zeros(att.size(0)).to('mps')
+            # elif torch.backends.mps.is_available():
+            #     s_att = torch.zeros(att.size(0)).to('mps')
             else:
                 s_att = torch.zeros(att.size(0))
             s_att[idx.squeeze().long()] = v.squeeze()
             W = old_w @ s_att.unsqueeze(0)
             if torch.cuda.is_available():
                 mask = torch.ones(W.size()).cuda()
-            elif torch.backends.mps.is_available():
-                mask = torch.ones(W.size()).to('mps')
+            # elif torch.backends.mps.is_available():
+            #     mask = torch.ones(W.size()).to('mps')
             else:
                 mask = torch.ones(W.size())
             mask[:, idx.squeeze().long()] = self.tau
