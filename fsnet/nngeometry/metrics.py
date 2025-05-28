@@ -202,6 +202,18 @@ def FIM(
             lambda_[new_idxs] = 1
             return lambda_ * estimates
 
+    elif variant == "student_t":
+        def function_fim(*d):
+            estimates = function(*d)
+            lambda_ = kwargs.get('lambda_')
+            new_idxs = kwargs.get('new_idxs')
+            scale = kwargs.get('scale')
+            lambda_ = torch.ones_like(estimates) * lambda_
+            lambda_[new_idxs] = 1
+            deg_f = kwargs.get('deg_f')
+            constant = (deg_f + 1) / (scale**2*(deg_f + 3))
+            return estimates * (constant * lambda_) ** 0.5 
+        
     else:
         raise NotImplementedError
 

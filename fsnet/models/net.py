@@ -13,7 +13,7 @@ class TS2VecEncoderWrapper(nn.Module):
         self.mask = mask
 
     def forward(self, input):
-        return self.encoder(input, mask=self.mask)[:, -1]
+        return self.encoder(input.float(), mask=self.mask)[:, -1]
 
 class Net(nn.Module):
     def __init__(self, 

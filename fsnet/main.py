@@ -5,6 +5,7 @@ import os
 from exp.exp_er import ExperienceReplayExp
 from exp.exp_fsnet import FSNetExp
 from exp.exp_naive import NaiveExp
+from exp.exp_ocar import OCARExp
 
 import torch
 import random
@@ -41,6 +42,13 @@ def prepare_config(experience_strategy: str, main_config_path: str):
             config = yaml.safe_load(f)
         config["model"]["model"] = "fsnet"
         exp_class = FSNetExp
+    elif experience_strategy == "ocar":
+        # ocar
+        config_path = os.path.join(main_config_path, "config_ocar.yaml")
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        config["model"]["model"] = "ocar"
+        exp_class = OCARExp
     else:
         raise ValueError("Experience strategy not supported")
 
@@ -120,7 +128,7 @@ def prepare_config(experience_strategy: str, main_config_path: str):
 
 def main():
 
-    EXPERIENCE_STRATEGY = "er"  # alternatives: 'fsnet', 'er', 'naive'
+    EXPERIENCE_STRATEGY = "ocar"  # alternatives: 'fsnet', 'er', 'naive', 'ocar
     MAIN_CONFIG_PATH = "/Users/platypus/Desktop/OCL_TS/fsnet/configs"
     TUNE_HYPERPARAMETERS = False    # alternatives: True, False
     

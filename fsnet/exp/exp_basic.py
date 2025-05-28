@@ -62,7 +62,7 @@ class OCLTSExp:
         model_name = self.model_config.pop("model")
         if model_name == "fsnet":
             model_class = FSNet
-        elif model_name == "simple" or model_name == "naive":
+        elif model_name == "simple" or model_name == "naive" or model_name == "ocar":
             model_class = Net
 
         self.model = model_class(
@@ -224,10 +224,8 @@ class OCLTSExp:
                     )
                     iter_count = 0
                     time_now = time.time()
-                try:
+                if hasattr(self.model, "store_grad"):
                     self.model.store_grad()
-                except AttributeError:
-                    pass
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
