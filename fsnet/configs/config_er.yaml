@@ -1,8 +1,8 @@
 checkpoint_path: /Users/platypus/Desktop/OCL_TS/fsnet/checkpoints_er/
 
 data:
-  data: ECL
-  root_path: /Users/platypus/Desktop/OCL_TS/fsnet/data/ECL
+  data: ETTm1
+  root_path: /Users/platypus/Desktop/OCL_TS/fsnet/data/ETT
   freq: h
   features: M     # maybe this indicates if we want to use multiple features or not for input and output
   seq_len: 60
@@ -55,7 +55,7 @@ tuning:
   #er_loss_weight: {loguniform: [0.01, 10]} #{choice: [2]}
   #buffer_type: {choice: [fifo, reservoir]} #{choice: [reservoir]}
   buffer_size: 500
-  learning_rate: 0.001
+  learning_rate: 0.0005
   n_replay: 8
   er_loss_weight: 1
   buffer_type: "reservoir"
