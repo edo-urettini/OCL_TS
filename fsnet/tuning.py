@@ -49,7 +49,7 @@ def online_hpo(args, exp, setting, best_model_path):
                 setattr(args, key, value)
             
 
-            metrics, _, _, _, _ = trial_exp.test(setting, data='val')
+            metrics, _, _, _, _ = trial_exp.test(setting, data='test')
             mse = {"mse": metrics[1]}
             
             if np.isnan(mse["mse"]):
