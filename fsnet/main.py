@@ -178,12 +178,9 @@ for ii in range(args.itr):
     print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
     m, mae_, mse_, p, t = exp.test(setting)
     metrics.append(m)
-    if str(args.data) == 'ECL' or str(args.data) == 'Traffic':
-        preds=[0]
-        true=[0]
-    else:
-        preds.append(p)
-        true.append(t)
+    
+    preds.append(p)
+    true.append(t)
 
     mae.append(mae_)
     mse.append(mse_)

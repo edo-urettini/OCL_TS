@@ -233,8 +233,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
     def test(self, setting, data='test'):
         test_data, test_loader = self._get_data(flag=data)
 
-        #reset optimizer to SGD using online_lr
-        self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
+        #reset optimizer using online_lr
+        self.opt = optim.AdamW(self.model.parameters(), lr=self.args.online_lr)
 
         self.model.eval()
         if self.online == 'regressor':

@@ -1,1 +1,3 @@
-online_lr: 0.09817199121138272
+online_lr: 0.1
+OCAR_regul: 10.0
+deg_f: 100.0

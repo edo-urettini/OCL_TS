@@ -18,11 +18,12 @@ from torch.utils.data import DataLoader
 from collections import defaultdict
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV, train_test_split
-from nngeometry.metrics import FIM
 from nngeometry.object import PMatDiag, PMatBlockDiag, PMatKFAC, PMatEKFAC, PMatDense, PMatQuasiDiag, PVector
 from nngeometry.layercollection import LayerCollection
 from utils.stats import StudentTLoss
 from scipy.stats import norm
+
+from nngeometry.metrics import FIM_MonteCarlo, FIM
 
 import os, csv
 import time
@@ -104,6 +105,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.loss_sq_mean= 0.0
         self.z = norm.ppf(0.99)
         self.loss = 0.0
+        self.grad_EMA = None
         ########################
 
     def _get_data(self, flag):
@@ -380,7 +382,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
             lc = LayerCollection()
             lc.add_layer_from_model(self.model, self.model.regressor)
 
-        #Update FIM condition (trigger if current loss is worst 5%)
+        #Update FIM condition (trigger if current loss is worst p%)
         loss_a = 0.01
         if self.loss_mean == 0.0:
             self.loss_mean = self.loss
@@ -412,25 +414,39 @@ class Exp_TS2VecSupervised(Exp_Basic):
             #Compute and update the FIM
             # FIM must not compute the gradients
             #with torch.no_grad():
+            '''''
             F = FIM(model=self.model,
                     loader=temp_dataloader,
                     representation=self.representation,
-                    n_output=mb_output.size(1),
                     variant=self.variant, 
                     device=self.device,
                     lambda_=self.lambda_,
                     new_idxs=[0],
                     deg_f = self.deg_f,
-                    layer_collection=lc,
-                    scale = self.scale,)
+                    scale = self.scale,
+                    n_output=mb_output.size(1))
+            '''''
 
+            
+            F = FIM_MonteCarlo(model=self.model,
+                    loader=temp_dataloader,
+                    representation=self.representation,
+                    variant=self.variant, 
+                    device=self.device,
+                    trials=100,
+                    lambda_=self.lambda_,
+                    new_idxs=[0],
+                    deg_f = self.deg_f,
+                    scale = self.scale,
+                    n_output=mb_output.size(1))
+             
             #Update the EMA of the FIM
             if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
                 self.F_ema = F
             else:
                 self.F_ema = self.EMA_kfac(self.F_ema, F)
             id_last = list(self.F_ema.data.keys())[-1]
-            self.F_ema_inv = self.F_ema.inverse(id_last=id_last, regul = self.tau, regul_last=self.tau)
+            self.F_ema_inv = self.F_ema.inverse(regul = self.tau)
 
         self.iterations += 1
 
@@ -443,7 +459,6 @@ class Exp_TS2VecSupervised(Exp_Basic):
         original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)
         regularized_grad = self.F_ema_inv.mv(original_grad_vec)
         regularized_grad.to_model_grad(self.model)
-
 
     def EMA_kfac(self, mat_old, mat_new):
         """
@@ -513,7 +528,34 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
         return mat_new
     
+    def EMA_grad(self, grad_old, grad_new):
+        old = grad_old._dict_to_flat()
+        new = grad_new._dict_to_flat()
+        ema_flat = (1 - self.alpha_ema) * old + self.alpha_ema * new
+        return PVector(grad_old.layer_collection, vector_repr=ema_flat)
+    
 
+    def compare_FIMs(self, F1, F2):
+        """
+        compute Frobenius norm of the difference between two FIMs
+        """
+        F1 = F1.data
+        F2 = F2.data
+        total_diff_norm = 0.0
+        total_F1_norm = 0.0
+        for key in F1.keys():
+            a1, g1 = F1[key]
+            a2, g2 = F2[key]
+            diff_norm = torch.norm(a1 - a2)**2 + torch.norm(g1 - g2)**2
+            F1_norm = torch.norm(a1)**2 + torch.norm(g1)**2
+            total_diff_norm += diff_norm 
+            total_F1_norm += F1_norm
+        total_norm = total_diff_norm / total_F1_norm
+
+        return np.sqrt(total_norm.item())
+            
+        
+        
 
     def before_update_temp(self, mb_x, mb_output, mb_y):
 
