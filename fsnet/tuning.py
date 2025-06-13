@@ -44,10 +44,10 @@ def online_hpo(args, exp, setting, best_model_path):
             for key, value in config.items():
                 setattr(trial_args, key, value)
 
-            init_dl_program(args.gpu, seed=args.finetune_model_seed)
+            init_dl_program(trial_args.gpu, seed=trial_args.finetune_model_seed)
 
-            Exp = getattr(importlib.import_module('exp.exp_{}'.format(args.method)), 'Exp_TS2VecSupervised')
-            trial_exp = Exp(args)
+            Exp = getattr(importlib.import_module('exp.exp_{}'.format(trial_args.method)), 'Exp_TS2VecSupervised')
+            trial_exp = Exp(trial_args)
 
             trial_exp.model.load_state_dict(torch.load(best_model_path)) 
 
