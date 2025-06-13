@@ -11,6 +11,7 @@ import yaml
 import importlib
 
 from utils.tools import init_dl_program
+import copy
 
 def online_hpo(args, exp, setting, best_model_path):
     """
@@ -33,21 +34,22 @@ def online_hpo(args, exp, setting, best_model_path):
     # Define the hyperparameter search space.
     search_space = {
         "online_lr": tune.loguniform(1e-4, 1e-1),
-        #"OCAR_regul" : tune.loguniform(1e-2, 1e-0),
-        #"OCAR_regul_last" : tune.loguniform(1e-2, 1e-0),
-        #"OCAR_alpha_ema" : tune.uniform(0.0, 1.0),
+        "OCAR_regul" : tune.loguniform(1e-2, 1e-0),
+        "OCAR_alpha_ema" : tune.uniform(0.0, 1.0),
     }
 
-    def train_function(config):
+    def train_function(config, base_args):
         try: 
+            trial_args = copy.deepcopy(base_args)
+            for key, value in config.items():
+                setattr(trial_args, key, value)
+
+            init_dl_program(args.gpu, seed=args.finetune_model_seed)
+
             Exp = getattr(importlib.import_module('exp.exp_{}'.format(args.method)), 'Exp_TS2VecSupervised')
             trial_exp = Exp(args)
 
-            trial_exp.model.load_state_dict(torch.load(best_model_path))
-
-            for key, value in config.items():
-                setattr(args, key, value)
-            
+            trial_exp.model.load_state_dict(torch.load(best_model_path)) 
 
             metrics, _, _, _, _ = trial_exp.test(setting, data='test')
             mse = {"mse": metrics[1]}
@@ -66,12 +68,12 @@ def online_hpo(args, exp, setting, best_model_path):
 
     tuner = tune.Tuner(
         tune.with_resources(
-            tune.with_parameters(train_function),
-            {"gpu": 0.2, "num_retries": 0},
+            tune.with_parameters(train_function, base_args=args),
+            {"gpu": 0.15, "num_retries": 0},
         ),
         tune_config=tune.TuneConfig(
             num_samples=100,
-            max_concurrent_trials=4,
+            max_concurrent_trials=6,
             search_alg=hyperopt_search,
         ),
         param_space=search_space,
