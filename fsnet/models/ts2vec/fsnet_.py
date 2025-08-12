@@ -133,12 +133,13 @@ class SamePadConv(nn.Module):
         w,b,f = self.fw_chunks()
         d0, d1 = self.conv.weight.shape[1:]
         
-        cw = self.conv.weight * w
+        cw = (self.conv.weight * w)
+        cb = (self.bias * b)
         #cw = self.conv.weight
-        try:
-            conv_out = F.conv1d(x, cw, padding=self.padding, dilation=self.dilation, bias = self.bias * b)
-            out =  f * conv_out
-        except: pdb.set_trace()
+
+        #conv_out = F.conv1d(x, cw, padding=self.padding, dilation=self.dilation, bias = self.bias * b)
+        conv_out = torch.func.functional_call(self.conv,{'weight': cw, 'bias': cb}, x)
+        out = conv_out * f
         return out
 
     def representation(self, x):

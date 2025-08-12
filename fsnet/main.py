@@ -95,9 +95,9 @@ parser.add_argument('--OCAR_regul', type=float, default=0.1)
 parser.add_argument('--OCAR_regul_last', type=float, default=0.1)
 parser.add_argument('--OCAR_alpha_ema', type=float, default=0.5)
 parser.add_argument('--online_lr', type=float, default=0.001)
-parser.add_argument('--deg_f' , type=float, default=5, help='degree of freedom')
+parser.add_argument('--deg_f' , type=float, default=100, help='degree of freedom. If >=100 set to Gaussian')
 parser.add_argument('--ng_only_last', action='store_true', default=False)
-
+parser.add_argument('--OCAR_score_lr', type=float, default=0.1)
 parser.add_argument('--online_hpo',  action='store_true', default=False)
 
 args = parser.parse_args()

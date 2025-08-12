@@ -36,6 +36,7 @@ def online_hpo(args, exp, setting, best_model_path):
         "online_lr": tune.loguniform(1e-4, 1e-1),
         "OCAR_regul" : tune.loguniform(1e-2, 1e-0),
         "OCAR_alpha_ema" : tune.uniform(0.0, 1.0),
+        "OCAR_score_lr" : tune.loguniform(1e-2, 1),
     }
 
     def train_function(config, base_args):

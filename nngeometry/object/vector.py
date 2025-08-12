@@ -204,6 +204,14 @@ class PVector:
             return self._flat_to_dict()
         else:
             return NotImplementedError
+        
+    def to_flat(self):
+        if self.vector_repr is not None:
+            return self.vector_repr
+        elif self.dict_repr is not None:
+            return self._dict_to_flat()
+        else:
+            return NotImplementedError
 
     def _dict_to_flat(self):
         parts = []

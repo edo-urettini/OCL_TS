@@ -11,3 +11,5 @@ WTH/
 **/__pycache__/
 results*/
 ray_results/
+
+data/

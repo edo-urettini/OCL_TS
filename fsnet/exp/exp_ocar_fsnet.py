@@ -17,8 +17,11 @@ from torch.utils.data import DataLoader
 
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV, train_test_split
-from nngeometry.metrics import FIM
+from nngeometry.metrics import FIM_MonteCarlo, FIM
 from nngeometry.object import PMatDiag, PMatBlockDiag, PMatKFAC, PMatEKFAC, PMatDense, PMatQuasiDiag, PVector
+from nngeometry.layercollection import LayerCollection
+from scipy.stats import norm
+from utils.stats import StudentTLoss
 
 import os
 import time
@@ -82,20 +85,28 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 del state_dict[name]
             self.model[0].encoder.load_state_dict(state_dict)
 
+    
         ########################
         # ATTRIBUTES FOR OCAR
         self.tau = 0
         self.representation = PMatKFAC
-        self.variant = 'regression'
         self.regul = self.args.OCAR_regul
-        self.lambda_ = 1/8
+        self.regul_last = self.args.OCAR_regul_last
+        self.lambda_ = 0.2
         self.F_ema = None
         self.F_ema_inv = None
         self.alpha_ema = self.args.OCAR_alpha_ema
         self.alpha_ema_last = self.alpha_ema
         self.iterations = 0
-        self.output_size = None
-        self.freq = 20
+        self.freq = 100
+        self.deg_f = self.args.deg_f
+        self.ng_only_last = self.args.ng_only_last
+        self.scale = 1.0
+        self.loss_mean = 0.0
+        self.loss_sq_mean= 0.0
+        self.z = norm.ppf(0.99)
+        self.loss = 0.0
+        self.grad_EMA = None
         ########################
 
     def _get_data(self, flag):
@@ -164,7 +175,12 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return self.opt
 
     def _select_criterion(self):
-        criterion = nn.MSELoss()
+        if self.deg_f>=100:
+            criterion = nn.MSELoss()
+            self.variant = 'regression'
+        else:            
+            criterion = StudentTLoss(nu=self.deg_f, reduction='mean', scale=self.scale)
+            self.variant = 'student_t'
         return criterion
 
     def train(self, setting):
@@ -236,7 +252,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
 
-        return self.model
+        return self.model, best_model_path
 
     def vali(self, vali_data, vali_loader, criterion):
         self.model.eval()
@@ -250,11 +266,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.model.train()
         return total_loss
 
-    def test(self, setting):
-        test_data, test_loader = self._get_data(flag='test')
+    def test(self, setting, data='test'):
+        test_data, test_loader = self._get_data(flag=data)
 
-        #reset optimizer to SGD using online_lr
-        self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
+        #reset optimizer using online_lr
+        self.opt = optim.AdamW(self.model.parameters(), lr=self.args.online_lr)
 
         self.model.eval()
         if self.online == 'regressor':
@@ -323,14 +339,18 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
             loss = criterion(outputs, true)
             loss.backward()
-            #############
+            self.model.store_grad()
+            # mettere qua OCAR
+            ###################
+            self.loss = loss.item()
+            # concatenate curr data and buffer data
+
             mb_x = x
             mb_output = outputs
             mb_y = true
             self.before_update(mb_x, mb_output, mb_y)
-            #################
+            ###################
             self.opt.step()       
-            self.model.store_grad()
             self.opt.zero_grad()
 
         f_dim = -1 if self.args.features=='MS' else 0
@@ -338,81 +358,104 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return outputs, rearrange(batch_y, 'b t d -> b (t d)')
 
     def before_update(self, mb_x, mb_output, mb_y):
-            '''This should not be needed
-            # Check if new classes are observed
-            curr_classes = set(strategy.experience.classes_in_this_experience)
-            new_classes = curr_classes - self.known_classes    
-            if new_classes:
-                self.known_classes.update(curr_classes)
-            '''
 
+        #Create layer collection
+        lc = None
+        if self.ng_only_last:
+            lc = LayerCollection()
+            lc.add_layer_from_model(self.model, self.model.regressor)
+        else:
+            #Exclude calibration and controller layers
+            lc = LayerCollection()
+            for layer, mod in self.model.named_modules():
+                mod_class = mod.__class__.__name__
+                if mod_class in LayerCollection._known_modules and 'controller' not in layer.lower() and 'calib' not in layer.lower():
+                    lc.add_layer(layer, LayerCollection._module_to_layer(mod))
+                
+                
 
-            #Compute the weights for the FIM to compensate for different classes frequencies
-            batch_size = int(mb_x.size(0))
-            weights = torch.ones(batch_size, device=self.device)
-            '''This should not be needed
-            n_known = len(self.known_classes)
-            if len(self.buffer_idx) == len(weights):
-                #######WARNING, MODIFIED FOR CLEAR########
-                if self.iterations % strategy.train_epochs == 0:
-                    weights[self.buffer_idx] = self.n_new 
-                    self.n_new = self.n_new + strategy.train_epochs * self.regul
-            '''
+        #Update FIM condition (trigger if current loss is worst p%)
+        loss_a = 0.01
+        if self.loss_mean == 0.0:
+            self.loss_mean = self.loss
+            self.loss_sq_mean = self.loss**2
+        self.loss_mean = (1 - loss_a) * self.loss_mean + loss_a * self.loss
+        self.loss_sq_mean = (1 - loss_a) * self.loss_sq_mean + loss_a * self.loss**2            
+        loss_std = np.sqrt(self.loss_sq_mean - self.loss_mean**2)
+        if self.loss > self.loss_mean + self.z * loss_std or self.iterations % self.freq == 0:
+            update_fim = True
+            self.tau = self.regul
+        else:
+            update_fim = False   
+            self.tau += (1-self.regul)/self.freq
+        
 
-            if self.tau == 0:
-                self.tau = self.opt.param_groups[0]['lr']
-            else:
-                self.tau = self.tau + self.regul
+        #Create a temporary dataloader to compute the FIM
+        temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
+        temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
 
-            #Create a temporary dataloader to compute the FIM
-            temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
-            temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
+        if self.representation == PMatEKFAC and self.F_ema is not None:
+            old_diag = self.F_ema.data[1]
+        else:
+            old_diag = None
 
-            if self.representation == PMatEKFAC and self.F_ema is not None:
-                old_diag = self.F_ema.data[1]
-            else:
-                old_diag = None
+        #if mb_output.size(1) != self.output_size:
+        #    self.iterations = 0
+        
+        if update_fim:
+            #Compute and update the FIM
+            # FIM must not compute the gradients
+            #with torch.no_grad():
+            '''''
+            F = FIM(model=self.model,
+                    loader=temp_dataloader,
+                    representation=self.representation,
+                    variant=self.variant, 
+                    device=self.device,
+                    lambda_=self.lambda_,
+                    new_idxs=[0],
+                    deg_f = self.deg_f,
+                    scale = self.scale,
+                    n_output=mb_output.size(1))
+            '''''
 
-            #if mb_output.size(1) != self.output_size:
-            #    self.iterations = 0
             
-            if self.iterations % self.freq == 0:
-                #Compute and update the FIM
-                # FIM must not compute the gradients
-                #with torch.no_grad():
-                F = FIM(model=self.model,
-                        loader=temp_dataloader,
-                        representation=self.representation,
-                        n_output=mb_output.size(1),
-                        variant=self.variant, 
-                        device=self.device,
-                        lambda_=self.lambda_)
+            F = FIM_MonteCarlo(model=self.model,
+                    loader=temp_dataloader,
+                    representation=self.representation,
+                    variant=self.variant, 
+                    device=self.device,
+                    trials=100,
+                    lambda_=self.lambda_,
+                    new_idxs=[0],
+                    deg_f = self.deg_f,
+                    scale = self.scale,
+                    n_output=mb_output.size(1),
+                    layer_collection=lc)
+             
+            #Update the EMA of the FIM
+            if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
+                self.F_ema = F
+            else:
+                self.F_ema = self.EMA_kfac(self.F_ema, F)
+            id_last = list(self.F_ema.data.keys())[-1]
+            self.F_ema_inv = self.F_ema.inverse(regul = self.tau)
 
-                #Update the EMA of the FIM
-                if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
-                    self.F_ema = F
-                else:
-                    self.F_ema = self.EMA_kfac(self.F_ema, F)
-                self.F_ema_inv = self.F_ema.inverse(regul = self.regul*self.opt.param_groups[0]['lr'])
+        self.iterations += 1
 
-            self.iterations += 1
+        if self.representation == PMatEKFAC:
+            self.F_ema.update_diag(temp_dataloader)
+            if old_diag is not None:
+                self.F_ema = self.EMA_diag(old_diag, self.F_ema)
 
-            if self.representation == PMatEKFAC:
-                self.F_ema.update_diag(temp_dataloader)
-                if old_diag is not None:
-                    self.F_ema = self.EMA_diag(old_diag, self.F_ema)
-
-            #original_last_known = torch.norm(strategy.model.linear.classifier.weight.grad[list(self.known_classes), :].flatten())
-            #original_last_new = torch.norm(strategy.model.linear.classifier.weight.grad[list(new_classes), :].flatten())
-
-            #Size of the output layer
-            self.output_size = mb_output.size(1)
-
-
-            #Compute the regularized gradient
-            original_grad_vec = PVector.from_model_grad(self.model)
-            regularized_grad = self.F_ema_inv.mv(original_grad_vec)
-            regularized_grad.to_model_grad(self.model)
+        #Compute the regularized gradient
+        original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)
+        if self.grad_EMA is None:
+            self.grad_EMA = original_grad_vec
+        else:
+            self.grad_EMA = self.EMA_grad(self.grad_EMA, original_grad_vec)
+        regularized_grad = self.F_ema_inv.mv(self.grad_EMA)
+        regularized_grad.to_model_grad(self.model)
 
     def EMA_kfac(self, mat_old, mat_new):
         """
@@ -442,7 +485,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
             new[layer_id] = (ema_a, ema_g)
         
-        
+       
         if last_old_layer != last_new_layer and self.alpha_ema_last < 1.0:
             a_old_last, g_old_last = old[last_old_layer]
             a_new_last, g_new_last = new[last_new_layer]
@@ -457,8 +500,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
             mat_new.data = (new, mat_new.data[1])
         else:
             mat_new.data = new
-
-            # Create a new PMatKFAC instance with the EMA data
+ 
+         # Create a new PMatKFAC instance with the EMA data
         return mat_new
 
 
@@ -481,3 +524,10 @@ class Exp_TS2VecSupervised(Exp_Basic):
         mat_new.data = (mat_new.data[0], new)
 
         return mat_new
+    
+    def EMA_grad(self, grad_old, grad_new):
+        old = grad_old.to_flat()
+        new = grad_new.to_flat()
+        ema_flat = (1 - self.alpha_ema) * old + self.alpha_ema * new
+        return PVector(grad_old.layer_collection, vector_repr=ema_flat)
+    
