@@ -464,7 +464,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
             if self.F_ema is None or (self.alpha_ema == 1.0 and self.alpha_ema_last == 1.0):
                 self.F_ema = F
             else:
-                self.F_ema = self.EMA_kfac(self.F_ema, F, delta_t=self.delta_t)
+                self.F_ema = self.EMA_kfac(self.F_ema, F)
             id_last = list(self.F_ema.data.keys())[-1]
             self.F_ema_inv = self.F_ema.inverse(regul = self.tau)
 
@@ -474,13 +474,6 @@ class Exp_TS2VecSupervised(Exp_Basic):
             self.F_ema.update_diag(temp_dataloader)
             if old_diag is not None:
                 self.F_ema = self.EMA_diag(old_diag, self.F_ema)
-
-        #Update scale parameter
-        err = mb_y - mb_output
-        score_scale = (self.deg_f * self.scale * (err**2 - self.scale)) / (self.deg_f * self.scale + err**2)
-        score_scale = score_scale.mean(dim=0)
-        self.scale = self.scale + self.score_lr * score_scale
-        self.scale = torch.clamp(self.scale, min=1e-2, max=1e3)
 
         #Compute the regularized gradient
         original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)

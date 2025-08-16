@@ -8,7 +8,7 @@ class StudentTLoss(nn.Module):
         self.nu = nu
         self.reduction = reduction
 
-    def forward(self, x, y, scale):
+    def forward(self, x, y, scale=1):
         diff = x - y
 
         #we ignore the constant term
