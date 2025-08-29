@@ -99,14 +99,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.freq = 100
         self.deg_f = self.args.deg_f
         self.ng_only_last = self.args.ng_only_last
-        self.scale = torch.ones(args.c_out * args.pred_len, requires_grad=False).to(self.device)
+        self.scale = torch.ones(1).to(self.device)
         self.loss_mean = 0.0
         self.loss_sq_mean= 0.0
         self.z = norm.ppf(0.99)
         self.loss = 0.0
         self.grad_EMA = None
         self.delta_t = 1
-        self.score_lr = self.args.OCAR_score_lr
+        self.score_lr = 0.1
         ########################
 
     def _get_data(self, flag):
@@ -176,7 +176,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return self.opt
 
     def _select_criterion(self):
-        if self.deg_f>=100:
+        if self.deg_f>1000:
             criterion = nn.MSELoss()
             self.variant = 'regression'
         else:            
@@ -279,8 +279,13 @@ class Exp_TS2VecSupervised(Exp_Basic):
     def test(self, setting, data='test'):
         test_data, test_loader = self._get_data(flag=data)
 
-        #reset optimizer to SGD using online_lr
-        self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
+        #reset optimizer
+        if self.opt_str == 'adam':
+            self.opt = optim.AdamW(self.model.parameters(), lr=self.args.online_lr)
+        elif self.opt_str == 'sgd':
+            self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
+        else:
+            raise NotImplementedError
 
         self.model.eval()
         if self.online == 'regressor':
@@ -409,14 +414,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
         loss_std = np.sqrt(self.loss_sq_mean - self.loss_mean**2)
         if self.loss > self.loss_mean + self.z * loss_std or self.iterations % self.freq == 0:
             update_fim = True
-            self.delta_t = 1
-            self.tau = self.regul
+            #self.delta_t = 1
+            #self.tau = self.regul
         else:
-            self.delta_t += 1
+            #self.delta_t += 1
             update_fim = False   
-            self.tau += (1-self.regul)/self.freq
+            #self.tau += (1-self.regul)/self.freq
         
-
+        self.tau = 1 / (1 + self.scale.item()**2)
         #Create a temporary dataloader to compute the FIM
         temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
         temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
@@ -475,6 +480,16 @@ class Exp_TS2VecSupervised(Exp_Basic):
             if old_diag is not None:
                 self.F_ema = self.EMA_diag(old_diag, self.F_ema)
 
+        #Update scale parameter
+        if self.variant == 'student_t':
+            with torch.no_grad():
+                err = mb_y - mb_output
+                score_scale = (self.deg_f * self.scale * (err**2 - self.scale)) / (self.deg_f * self.scale + err**2)
+                score_scale = score_scale.mean()
+                self.scale = self.scale + self.score_lr * score_scale
+                self.scale = torch.clamp(self.scale, min=1e-2, max=1e2)
+
+
         #Compute the regularized gradient
         original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)
         if self.grad_EMA is None:
@@ -483,6 +498,9 @@ class Exp_TS2VecSupervised(Exp_Basic):
             self.grad_EMA = self.EMA_grad(self.grad_EMA, original_grad_vec)
         regularized_grad = self.F_ema_inv.mv(self.grad_EMA)
         regularized_grad.to_model_grad(self.model)
+
+
+
 
     def EMA_kfac(self, mat_old, mat_new, delta_t=1):
         """

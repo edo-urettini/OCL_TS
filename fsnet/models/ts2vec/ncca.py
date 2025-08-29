@@ -31,6 +31,36 @@ def generate_continuous_mask(B, T, n=5, l=0.1):
 def generate_binomial_mask(B, T, p=0.5):
     return torch.from_numpy(np.random.binomial(1, p, size=(B, T))).to(torch.bool)
 
+class TSEncoderTime(nn.Module):
+    def __init__(self, input_dims, output_dims, hidden_dims=64, depth=10, mask_mode='binomial', gamma=0.9):
+        super().__init__()
+        self.input_dims = input_dims
+        self.output_dims = output_dims
+        self.hidden_dims = hidden_dims
+        self.mask_mode = mask_mode
+        self.input_fc = nn.Linear(input_dims, hidden_dims)
+        self.feature_extractor = DilatedConvEncoder(
+            hidden_dims,
+            [hidden_dims] * depth + [output_dims],
+            kernel_size=3, gamma=gamma
+        )
+        self.repr_dropout = nn.Dropout(p=0.1)
+
+        # [64] * 10 + [320] = [64, 64, 64, 64, 64, 64, 64, 64, 64 ,64, 320] = 11 items
+        # for i in range(len(...)) -> 0, 1, ..., 10
+    
+    def ctrl_params(self):
+        return self.feature_extractor.ctrl_params()
+
+    def forward(self, x, mask=None):  # x: B x T x input_dims
+        x = x.transpose(1, 2)
+        x = self.input_fc(x)  # B x T x Ch
+        x = x.transpose(1, 2)
+        # conv encoder
+        x = self.repr_dropout(self.feature_extractor(x))  # B x Co x T
+        x = x.transpose(1, 2)
+        return x
+
 class TSEncoder(nn.Module):
     def __init__(self, input_dims, output_dims, hidden_dims=64, depth=10, mask_mode='binomial', gamma=0.9):
         super().__init__()

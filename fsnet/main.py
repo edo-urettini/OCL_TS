@@ -60,7 +60,7 @@ parser.add_argument('--mix', action='store_false', help='use mix attention in ge
 parser.add_argument('--cols', type=str, nargs='+', help='certain cols from the data files as the input features')
 parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
 #parser.add_argument('--itr', type=int, default=2, help='experiments times')
-parser.add_argument('--itr', type=int, default=1, help='experiments times')
+parser.add_argument('--itr', type=int, default=3, help='experiments times')
 parser.add_argument('--train_epochs', type=int, default=6, help='train epochs')
 parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
 parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
@@ -89,6 +89,11 @@ parser.add_argument('--devices', type=str, default='0,1,2,3',help='device ids of
 
 parser.add_argument('--finetune', action='store_true', default=False)
 parser.add_argument('--finetune_model_seed', type=int)
+
+#Onenet
+parser.add_argument('--individual', type=int, default=1, help='individual head; True 1 False 0')
+parser.add_argument('--learning_rate_w', type=float, default=0.001, help='optimizer learning rate')
+parser.add_argument('--learning_rate_bias', type=float, default=0.001, help='optimizer learning rate')
 
 #OCAR
 parser.add_argument('--OCAR_regul', type=float, default=0.1)
@@ -158,7 +163,7 @@ for ii in range(args.itr):
     _ , best_model_path = exp.train(setting)
 
     #Hyperparameter tuning
-    if args.online_hpo:
+    if args.online_hpo and ii == 0:
         print('>>>>>>>start online hyperparameter tuning : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
         best_config = online_hpo(args, exp, setting, best_model_path)
 
@@ -176,7 +181,10 @@ for ii in range(args.itr):
     exp = Exp(args)
     exp.model.load_state_dict(torch.load(best_model_path))
     print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-    m, mae_, mse_, p, t = exp.test(setting)
+    try:
+        m, mae_, mse_, p, t = exp.test(setting)
+    except Exception as e:
+        print(f"Error during testing: {e}")
     metrics.append(m)
     
     preds.append(p)

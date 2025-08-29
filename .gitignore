@@ -11,5 +11,6 @@ WTH/
 **/__pycache__/
 results*/
 ray_results/
+tuning_results/
 
 data/

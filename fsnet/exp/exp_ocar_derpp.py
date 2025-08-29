@@ -99,12 +99,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.freq = 100
         self.deg_f = self.args.deg_f
         self.ng_only_last = self.args.ng_only_last
-        self.scale = 1.0
+        self.scale = torch.ones(1).to(self.device)
         self.loss_mean = 0.0
         self.loss_sq_mean= 0.0
         self.z = norm.ppf(0.99)
         self.loss = 0.0
         self.grad_EMA = None
+        self.delta_t = 1
+        self.score_lr = 0.1
         ########################
 
     def _get_data(self, flag):
@@ -173,7 +175,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         return self.opt
 
     def _select_criterion(self):
-        if self.deg_f>=100:
+        if self.deg_f>1000:
             criterion = nn.MSELoss()
             self.variant = 'regression'
         else:            
@@ -213,7 +215,10 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 self.opt.zero_grad()
                 pred, true = self._process_one_batch(
                     train_data, batch_x, batch_y, batch_x_mark, batch_y_mark)
-                loss = criterion(pred, true)
+                if self.variant == 'student_t':
+                    loss = criterion(pred, true, self.scale.detach())
+                else:
+                    loss = criterion(pred, true)
                 train_loss.append(loss.item())
 
                 if (i + 1) % 100 == 0:
@@ -257,7 +262,10 @@ class Exp_TS2VecSupervised(Exp_Basic):
         for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(vali_loader):
             pred, true = self._process_one_batch(
                 vali_data, batch_x, batch_y, batch_x_mark, batch_y_mark, mode='vali')
-            loss = criterion(pred.detach().cpu(), true.detach().cpu())
+            if self.variant == 'student_t':
+                loss = criterion(pred.detach().cpu(), true.detach().cpu(), self.scale.detach().cpu())
+            else:
+                loss = criterion(pred.detach().cpu(), true.detach().cpu())
             total_loss.append(loss)
         total_loss = np.average(total_loss)
         self.model.train()
@@ -266,8 +274,13 @@ class Exp_TS2VecSupervised(Exp_Basic):
     def test(self, setting, data='test'):
         test_data, test_loader = self._get_data(flag=data)
 
-        #reset optimizer using online_lr
-        self.opt = optim.AdamW(self.model.parameters(), lr=self.args.online_lr)
+        #reset optimizer
+        if self.opt_str == 'adam':
+            self.opt = optim.AdamW(self.model.parameters(), lr=self.args.online_lr)
+        elif self.opt_str == 'sgd':
+            self.opt = optim.SGD(self.model.parameters(), lr=self.args.online_lr)
+        else:
+            raise NotImplementedError
 
 
         self.model.eval()
@@ -336,12 +349,19 @@ class Exp_TS2VecSupervised(Exp_Basic):
             else:
                 outputs = self.model(x)
 
-            loss = criterion(outputs, true)
+            if self.variant == 'student_t':
+                loss = criterion(outputs, true, self.scale.detach())
+            else:
+                loss = criterion(outputs, true)
             if not self.buffer.is_empty():
                 buff_x, buff_y, logits = self.buffer.get_data(8)
                 out = self.model(buff_x)
-                loss += 0.2* criterion(out, buff_y)
-                loss += 0.2* criterion(logits, out)
+                if self.variant == 'student_t':
+                    loss += 0.2 * criterion(out, buff_y, self.scale.detach())
+                    loss += 0.2 * criterion(logits, out, self.scale.detach())
+                else:
+                    loss += 0.2* criterion(out, buff_y)
+                    loss += 0.2* criterion(logits, out)
             loss.backward()
             # mettere qua OCAR
             ###################
@@ -389,12 +409,14 @@ class Exp_TS2VecSupervised(Exp_Basic):
         loss_std = np.sqrt(self.loss_sq_mean - self.loss_mean**2)
         if self.loss > self.loss_mean + self.z * loss_std or self.iterations % self.freq == 0:
             update_fim = True
-            self.tau = self.regul
+            #self.delta_t = 1
+            #self.tau = self.regul
         else:
+            #self.delta_t += 1
             update_fim = False   
-            self.tau += (1-self.regul)/self.freq
+            #self.tau += (1-self.regul)/self.freq
         
-
+        self.tau = 1 / (1 + self.scale.item()**2)
         #Create a temporary dataloader to compute the FIM
         temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
         temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
@@ -434,7 +456,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     lambda_=self.lambda_,
                     new_idxs=[0],
                     deg_f = self.deg_f,
-                    scale = self.scale,
+                    scale = self.scale.detach(),
                     n_output=mb_output.size(1),
                     layer_collection=lc)
              
@@ -453,6 +475,16 @@ class Exp_TS2VecSupervised(Exp_Basic):
             if old_diag is not None:
                 self.F_ema = self.EMA_diag(old_diag, self.F_ema)
 
+        #Update scale parameter
+        if self.variant == 'student_t':
+            with torch.no_grad():
+                err = mb_y - mb_output
+                score_scale = (self.deg_f * self.scale * (err**2 - self.scale)) / (self.deg_f * self.scale + err**2)
+                score_scale = score_scale.mean()
+                self.scale = self.scale + self.score_lr * score_scale
+                self.scale = torch.clamp(self.scale, min=1e-2, max=1e2)
+
+
         #Compute the regularized gradient
         original_grad_vec = PVector.from_model_grad(self.model, layer_collection=lc)
         if self.grad_EMA is None:
@@ -462,7 +494,9 @@ class Exp_TS2VecSupervised(Exp_Basic):
         regularized_grad = self.F_ema_inv.mv(self.grad_EMA)
         regularized_grad.to_model_grad(self.model)
 
-    def EMA_kfac(self, mat_old, mat_new):
+
+
+    def EMA_kfac(self, mat_old, mat_new, delta_t=1):
         """
         Compute the exponential moving average of two PMatKFAC matrices.
 
@@ -470,6 +504,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         :param mat_new: The new PMatKFAC matrix.
         :return: A new PMatKFAC matrix representing the EMA.
         """
+        alpha = 1 - (1 - self.alpha_ema) ** delta_t
         if self.representation == PMatEKFAC:
             old = mat_old.data[0]
             new = mat_new.data[0]
@@ -485,8 +520,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
             a_old, g_old = old[layer_id]
             a_new, g_new = new[layer_id]
 
-            ema_a = (1 - self.alpha_ema) * a_old + self.alpha_ema * a_new
-            ema_g = (1 - self.alpha_ema) * g_old + self.alpha_ema * g_new
+            ema_a = (1 - alpha) * a_old + alpha * a_new
+            ema_g = (1 - alpha) * g_old + alpha * g_new
 
             new[layer_id] = (ema_a, ema_g)
         
