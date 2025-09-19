@@ -60,7 +60,7 @@ parser.add_argument('--mix', action='store_false', help='use mix attention in ge
 parser.add_argument('--cols', type=str, nargs='+', help='certain cols from the data files as the input features')
 parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
 #parser.add_argument('--itr', type=int, default=2, help='experiments times')
-parser.add_argument('--itr', type=int, default=3, help='experiments times')
+parser.add_argument('--itr', type=int, default=1, help='experiments times')
 parser.add_argument('--train_epochs', type=int, default=6, help='train epochs')
 parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
 parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
@@ -96,14 +96,15 @@ parser.add_argument('--learning_rate_w', type=float, default=0.001, help='optimi
 parser.add_argument('--learning_rate_bias', type=float, default=0.001, help='optimizer learning rate')
 
 #OCAR
-parser.add_argument('--OCAR_regul', type=float, default=0.1)
-parser.add_argument('--OCAR_regul_last', type=float, default=0.1)
+parser.add_argument('--OCAR_regul', type=float, default=0.5)
+parser.add_argument('--OCAR_regul_last', type=float, default=0.5)
 parser.add_argument('--OCAR_alpha_ema', type=float, default=0.5)
 parser.add_argument('--online_lr', type=float, default=0.001)
 parser.add_argument('--deg_f' , type=float, default=100, help='degree of freedom. If >1000 set to Gaussian')
 parser.add_argument('--ng_only_last', action='store_true', default=False)
 parser.add_argument('--OCAR_score_lr', type=float, default=0.1)
 parser.add_argument('--online_hpo',  action='store_true', default=False)
+parser.add_argument('--OCAR_alpha_ema_grad', type=float, default=0.9)
 
 args = parser.parse_args()
 

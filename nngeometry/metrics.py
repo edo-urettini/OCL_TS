@@ -75,6 +75,9 @@ def FIM_MonteCarlo(
         
     elif variant == "regression":
 
+        new_idxs = kwargs.get('new_idxs')
+        lambd = kwargs.get('lambda_')
+
         if "covariance" in kwargs:
             sigma_2 = kwargs["covariance"]
         else:
@@ -91,6 +94,9 @@ def FIM_MonteCarlo(
             normal = MultivariateNormal(loc=mean, covariance_matrix=covariance).sample(
                 sample_shape=(trials, output.size(0))
             )
+            lambda_ = torch.ones_like(output) * lambd
+            lambda_[new_idxs] = 1
+            normal *= (lambda_ ** 0.5).unsqueeze(0)
 
             return trials**-0.5 * (normal * output).sum(dim=-1)
         

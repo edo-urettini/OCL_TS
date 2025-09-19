@@ -34,7 +34,6 @@ def online_hpo(args, exp, setting, best_model_path):
     # Define the hyperparameter search space.
     search_space = {
         "online_lr": tune.loguniform(1e-4, 1e-1),
-        "OCAR_alpha_ema" : tune.uniform(0.0, 1.0),
     }
 
     def train_function(config, base_args):
@@ -71,7 +70,7 @@ def online_hpo(args, exp, setting, best_model_path):
             {"gpu": 0.20, "num_retries": 0},
         ),
         tune_config=tune.TuneConfig(
-            num_samples=50,
+            num_samples=30,
             max_concurrent_trials=5,
             search_alg=hyperopt_search,
         ),
