@@ -95,16 +95,16 @@ parser.add_argument('--individual', type=int, default=1, help='individual head; 
 parser.add_argument('--learning_rate_w', type=float, default=0.001, help='optimizer learning rate')
 parser.add_argument('--learning_rate_bias', type=float, default=0.001, help='optimizer learning rate')
 
-#OCAR
-parser.add_argument('--OCAR_regul', type=float, default=0.5)
-parser.add_argument('--OCAR_regul_last', type=float, default=0.5)
-parser.add_argument('--OCAR_alpha_ema', type=float, default=0.5)
+#NatSR
+parser.add_argument('--NatSR_regul', type=float, default=0.5)
+parser.add_argument('--NatSR_regul_last', type=float, default=0.5)
+parser.add_argument('--NatSR_alpha_ema', type=float, default=0.5)
 parser.add_argument('--online_lr', type=float, default=0.001)
 parser.add_argument('--deg_f' , type=float, default=100, help='degree of freedom. If >1000 set to Gaussian')
 parser.add_argument('--ng_only_last', action='store_true', default=False)
-parser.add_argument('--OCAR_score_lr', type=float, default=0.1)
+parser.add_argument('--NatSR_score_lr', type=float, default=0.1)
 parser.add_argument('--online_hpo',  action='store_true', default=False)
-parser.add_argument('--OCAR_alpha_ema_grad', type=float, default=0.9)
+parser.add_argument('--NatSR_alpha_ema_grad', type=float, default=0.9)
 
 args = parser.parse_args()
 
@@ -129,6 +129,8 @@ data_parser = {
     'Exchange': {'data': 'exchange_rate.csv', 'T':'OT', 'M':[8,8,8]},
     'Illness': {'data': 'national_illness.csv', 'T':'OT', 'M':[7,7,7]},
     'Traffic': {'data': 'traffic.csv', 'T':'OT', 'M':[862,862,862]},
+    'time_series_with_outliers': {'data': 'time_series_with_outliers.csv', 'T':'value', 'S':[1,1,1]},
+    'time_series_with_regimes': {'data': 'time_series_with_regimes.csv', 'T':'value', 'S':[1,1,1]},
 }
 if args.data in data_parser.keys():
     data_info = data_parser[args.data]

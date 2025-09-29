@@ -13,6 +13,8 @@ import importlib
 from utils.tools import init_dl_program
 import copy
 
+STORAGE_PATH = "./ray_results"      # change this path if needed
+
 def online_hpo(args, exp, setting, best_model_path):
     """
     Run hyperparameter tuning for the online training phase using Ray Tune
@@ -75,7 +77,7 @@ def online_hpo(args, exp, setting, best_model_path):
             search_alg=hyperopt_search,
         ),
         param_space=search_space,
-        run_config=tune.RunConfig(storage_path="/data/e.urettini/projects/OCL_TS/ray_results"),
+        run_config=tune.RunConfig(storage_path=STORAGE_PATH),
     )
 
     results = tuner.fit()
