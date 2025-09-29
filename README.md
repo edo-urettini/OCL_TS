@@ -4,14 +4,10 @@ This repository contains the codebase for our experiments our paper. It is based
 
 ## Reproducing the Results
 
-To reproduce the experimental results, please follow the steps below:
-
-1. Run the main scripts located in [`main/scripts`](main/scripts):
-   - Scripts containing `hpo` in their name perform **hyperparameter optimization (HPO)**.
-   - Other scripts perform **testing and evaluation**.
-
+To reproduce the experimental results, run the main scripts located in [`main/scripts`](main/scripts).
 Make sure to execute all relevant scripts to reproduce the full set of results.
 The list of possible arguments can be found in [`main/main.py`](main/main.py) file. For our experiments, we used mainly the default values of the parameters, except for the ones that change in the scripts and the ones in the [`best_configs`](best_configs/) folder.
+Note that running all the experiments take a lot of time. If you only want to test the code, make sure to change the list of configurations in the bash file.
 
 ---
 

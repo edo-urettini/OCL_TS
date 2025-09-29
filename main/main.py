@@ -11,16 +11,15 @@ import yaml
 from tuning import online_hpo
 from utils.tools import init_dl_program
 
-#from exp.exp_online import Exp_TS2VecSupervised
+
+
+DATA_PATH = "main/data/DATA/"    # change this if necessary
 
 
 parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
 
-#parser.add_argument('--data', type=str, required=True, default='ETTh1', help='data')
 parser.add_argument('--data', type=str, required=False, default='WTH', help='data')
-#parser.add_argument('--root_path', type=str, default='./data/ETT/', help='root path of the data file')
-parser.add_argument('--root_path', type=str, default='/data/e.urettini/DATA/', help='root path of the data file')
-#parser.add_argument('--data_path', type=str, default='ETTh1.csv', help='data file')    
+parser.add_argument('--root_path', type=str, default=DATA_PATH, help='root path of the data file')
 parser.add_argument('--data_path', type=str, default='WTH.csv', help='data file')    
 parser.add_argument('--features', type=str, default='M', help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
 #parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
@@ -28,18 +27,13 @@ parser.add_argument('--target', type=str, default='WetBulbCelsius', help='target
 parser.add_argument('--freq', type=str, default='h', help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
 parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
 
-#parser.add_argument('--seq_len', type=int, default=96, help='input sequence length of Informer encoder')
 parser.add_argument('--seq_len', type=int, default=60, help='input sequence length of Informer encoder')
-#parser.add_argument('--label_len', type=int, default=48, help='start token length of Informer decoder')
 parser.add_argument('--label_len', type=int, default=0, help='start token length of Informer decoder')
 parser.add_argument('--pred_len', type=int, default=24, help='prediction sequence length')
 # Informer decoder input: concat[start token series(label_len), zero padding series(pred_len)]
 parser.add_argument('--gamma', type=float, default=0.9)
-#parser.add_argument('--enc_in', type=int, default=7, help='encoder input size')
 parser.add_argument('--enc_in', type=int, default=12, help='encoder input size')
-#parser.add_argument('--dec_in', type=int, default=7, help='decoder input size')
 parser.add_argument('--dec_in', type=int, default=12, help='decoder input size')
-#parser.add_argument('--c_out', type=int, default=7, help='output size')
 parser.add_argument('--c_out', type=int, default=12, help='output size')
 parser.add_argument('--d_model', type=int, default=512, help='dimension of model')
 parser.add_argument('--n_heads', type=int, default=8, help='num of heads')
@@ -59,27 +53,22 @@ parser.add_argument('--do_predict', action='store_true', help='whether to predic
 parser.add_argument('--mix', action='store_false', help='use mix attention in generative decoder', default=True)
 parser.add_argument('--cols', type=str, nargs='+', help='certain cols from the data files as the input features')
 parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
-#parser.add_argument('--itr', type=int, default=2, help='experiments times')
-parser.add_argument('--itr', type=int, default=1, help='experiments times')
+parser.add_argument('--itr', type=int, default=3, help='experiments times')
 parser.add_argument('--train_epochs', type=int, default=6, help='train epochs')
 parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
 parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
-#parser.add_argument('--learning_rate', type=float, default=0.0001, help='optimizer learning rate')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='optimizer learning rate')
-#parser.add_argument('--des', type=str, default='test',help='exp description')
 parser.add_argument('--des', type=str, default='Exp',help='exp description')
 parser.add_argument('--loss', type=str, default='mse',help='loss function')
 parser.add_argument('--lradj', type=str, default='type1',help='adjust learning rate')
 parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
 parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
-#parser.add_argument('--method', type=str, default='online')
 parser.add_argument('--method', type=str, default='er')
 
 parser.add_argument('--teacher_forcing', action='store_true', help='use teacher forcing during forecasting', default=False)
 parser.add_argument('--online_learning', type=str, default='full')
 parser.add_argument('--opt', type=str, default='adam')
 
-#parser.add_argument('--test_bsz', type=int, default=-1)
 parser.add_argument('--test_bsz', type=int, default=1)
 parser.add_argument('--n_inner', type=int, default=1)
 parser.add_argument('--use_gpu', type=bool, default=True, help='use gpu')
@@ -100,7 +89,7 @@ parser.add_argument('--NatSR_regul', type=float, default=0.5)
 parser.add_argument('--NatSR_regul_last', type=float, default=0.5)
 parser.add_argument('--NatSR_alpha_ema', type=float, default=0.5)
 parser.add_argument('--online_lr', type=float, default=0.001)
-parser.add_argument('--deg_f' , type=float, default=100, help='degree of freedom. If >1000 set to Gaussian')
+parser.add_argument('--deg_f' , type=float, default=50, help='degree of freedom. If >1000 set to Gaussian')
 parser.add_argument('--ng_only_last', action='store_true', default=False)
 parser.add_argument('--NatSR_score_lr', type=float, default=0.1)
 parser.add_argument('--online_hpo',  action='store_true', default=False)
