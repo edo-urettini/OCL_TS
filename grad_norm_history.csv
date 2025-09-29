@@ -1,1 +1,0 @@
-iteration,original_grad_norm,regularized_grad_norm,target_norm,input_norm,new_input_norm,old_input_norm,scale,regul,deg_f,FIM_diff,update
