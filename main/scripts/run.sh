@@ -17,9 +17,9 @@ if [[ "$data" = "Traffic" && "$pred_len" = "48" ]]; then
     continue
 fi
 if [ "$data" = "ETTh1" ]; then
-    CUDA_VISIBLE_DEVICES=1 python main/main.py --data=ETTh1 --method=$method --pred_len=$pred_len --opt=$opt --online_hpo --itr=1
+    CUDA_VISIBLE_DEVICES=1 python main/main_run.py --data=ETTh1 --method=$method --pred_len=$pred_len --opt=$opt --online_hpo --itr=1
 else
-    CUDA_VISIBLE_DEVICES=1 python main/main.py --data=$data --method=$method --pred_len=$pred_len --opt=$opt
+    CUDA_VISIBLE_DEVICES=1 python main/main_run.py --data=$data --method=$method --pred_len=$pred_len --opt=$opt
 fi
 done
 done
