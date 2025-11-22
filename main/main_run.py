@@ -8,13 +8,15 @@ import datetime
 import importlib
 import yaml
 
-from tuning import online_hpo
-from utils.tools import init_dl_program
+
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from main.tuning import online_hpo
+from main.utils.tools import init_dl_program
 
 
 
 DATA_PATH = "main/data/DATA/"    # change this if necessary
-
 
 parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
 
@@ -63,7 +65,7 @@ parser.add_argument('--loss', type=str, default='mse',help='loss function')
 parser.add_argument('--lradj', type=str, default='type1',help='adjust learning rate')
 parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
 parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
-parser.add_argument('--method', type=str, default='er')
+parser.add_argument('--method', type=str, default='natsr')
 
 parser.add_argument('--teacher_forcing', action='store_true', help='use teacher forcing during forecasting', default=False)
 parser.add_argument('--online_learning', type=str, default='full')
@@ -94,10 +96,10 @@ parser.add_argument('--ng_only_last', action='store_true', default=False)
 parser.add_argument('--NatSR_score_lr', type=float, default=0.1)
 parser.add_argument('--online_hpo',  action='store_true', default=False)
 parser.add_argument('--NatSR_alpha_ema_grad', type=float, default=0.9)
+parser.add_argument('--replay_buff_size', type=int, default=8)
 
 args = parser.parse_args()
 
-args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
 args.test_bsz = args.batch_size if args.test_bsz == -1 else args.test_bsz
 if args.use_gpu and args.use_multi_gpu:
     args.devices = args.devices.replace(' ','')
@@ -173,10 +175,10 @@ for ii in range(args.itr):
     exp = Exp(args)
     exp.model.load_state_dict(torch.load(best_model_path))
     print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-    try:
-        m, mae_, mse_, p, t = exp.test(setting)
-    except Exception as e:
-        print(f"Error during testing: {e}")
+    # try:
+    m, mae_, mse_, p, t = exp.test(setting)
+    # except Exception as e:
+    #     print(f"Error during testing: {e}")
     metrics.append(m)
     
     preds.append(p)

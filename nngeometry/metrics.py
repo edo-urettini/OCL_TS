@@ -8,7 +8,7 @@ from torch.distributions.studentT import StudentT
 from .backend import TorchHooksJacobianBackend
 from .layercollection import LayerCollection
 
-from fsnet.utils.stats import StudentTLoss
+from main.utils.stats import StudentTLoss
 
 
 def FIM_MonteCarlo(

@@ -85,15 +85,15 @@ class Exp_TS2VecSupervised(Exp_Basic):
             self.model[0].encoder.load_state_dict(state_dict)
         
         ########################
-        # ATTRIBUTES FOR OCAR
+        # ATTRIBUTES FOR NatSR
         self.tau = 0
         self.representation = PMatKFAC
-        self.regul = self.args.OCAR_regul
-        self.regul_last = self.args.OCAR_regul_last
+        self.regul = self.args.NatSR_regul
+        self.regul_last = self.args.NatSR_regul_last
         self.lambda_ = 0.2
         self.F_ema = None
         self.F_ema_inv = None
-        self.alpha_ema = self.args.OCAR_alpha_ema
+        self.alpha_ema = self.args.NatSR_alpha_ema
         self.alpha_ema_last = self.alpha_ema
         self.iterations = 0
         self.freq = 100
@@ -107,7 +107,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.grad_EMA = None
         self.delta_t = 1
         self.score_lr = 0.1
-        self.alpha_ema_grad = self.args.OCAR_alpha_ema_grad
+        self.alpha_ema_grad = self.args.NatSR_alpha_ema_grad
         ########################
 
     def _get_data(self, flag):
@@ -359,7 +359,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
             else:
                 loss = criterion(outputs, true)
             if not self.buffer.is_empty():
-                buff_x, buff_y, idx = self.buffer.get_data(8)
+                buff_x, buff_y, idx = self.buffer.get_data(self.args.replay_buff_size)
                 out = self.model(buff_x)
                 if self.variant == 'student_t':
                     loss += 0.2 * criterion(out, buff_y, self.scale.detach())
@@ -367,7 +367,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     loss += 0.2* criterion(out, buff_y)
             loss = loss / 1.2
             loss.backward()
-            # mettere qua OCAR
+            # mettere qua NatSR
             ###################
             self.loss = loss.item()
             # concatenate curr data and buffer data
@@ -422,7 +422,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
             update_fim = False   
             #self.tau += (1-self.regul)/self.freq
         
-        self.tau =  0.9/ (1 + self.scale.item()**2) + (0.1/self.scale.item()**2)
+        #self.tau =  0.9/ (1 + self.scale.item()**2) + (0.1/self.scale.item()**2)
+        self.tau =  self.regul
         #Create a temporary dataloader to compute the FIM
         temp_dataset = torch.utils.data.TensorDataset(mb_x, mb_y)
         temp_dataloader = torch.utils.data.DataLoader(temp_dataset, batch_size=mb_x.size(0), shuffle=False)
