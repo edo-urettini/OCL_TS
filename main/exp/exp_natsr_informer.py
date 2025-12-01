@@ -444,6 +444,28 @@ class Exp_TS2VecSupervised(Exp_Basic):
         if self.ng_only_last:
             lc = LayerCollection()
             lc.add_layer_from_model(self.model, self.model.projection)
+        else:
+            lc = LayerCollection()
+            known_modules = {
+                "Linear",
+                "Conv2d",
+                "BatchNorm1d",
+                "BatchNorm2d",
+                "GroupNorm",
+                "WeightNorm1d",
+                "WeightNorm2d",
+                "Cosine1d",
+                "Affine1d",
+                "ConvTranspose2d",
+                "Conv1d",
+                "LayerNorm",
+                "Embedding",
+            }
+            for layer, mod in self.model.named_modules():
+                mod_class = mod.__class__.__name__
+                if mod_class in known_modules:
+                    lc.add_layer(layer, LayerCollection._module_to_layer(mod))
+            return lc
 
         #Update FIM condition (trigger if current loss is worst p%)
         loss_a = 0.01
@@ -499,7 +521,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
                     representation=self.representation,
                     variant=self.variant, 
                     device=self.device,
-                    trials=1,
+                    trials=10,
                     lambda_=self.lambda_,
                     new_idxs=[0],
                     deg_f = self.deg_f,

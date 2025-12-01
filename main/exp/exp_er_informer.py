@@ -327,26 +327,26 @@ class Exp_TS2VecSupervised(Exp_Basic):
 
                 # decoder input
                 if self.args.padding==0:
-                    dec_inp = torch.zeros([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float()
+                    buff_dec_inp = torch.zeros([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float()
                 elif self.args.padding==1:
-                    dec_inp = torch.ones([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float()
-                dec_inp = torch.cat([buff_y[:,:self.args.label_len,:], dec_inp], dim=1).float().to(self.device)
+                    buff_dec_inp = torch.ones([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float()
+                buff_dec_inp = torch.cat([buff_y[:,:self.args.label_len,:], buff_dec_inp], dim=1).float().to(self.device)
                 # encoder - decoder
                 if self.args.use_amp:
                     with torch.cuda.amp.autocast():
                         if self.args.output_attention:
-                            out = self.model(buff_x, buff_x_mark, dec_inp, buff_y_mark)[0]
+                            out = self.model(buff_x, buff_x_mark, buff_dec_inp, buff_y_mark)[0]
                         else:
-                            out = self.model(buff_x, buff_x_mark, dec_inp, buff_y_mark)
+                            out = self.model(buff_x, buff_x_mark, buff_dec_inp, buff_y_mark)
                 else:
                     if self.args.output_attention:
-                        out = self.model(buff_x, buff_x_mark, dec_inp, buff_y_mark)[0]
+                        out = self.model(buff_x, buff_x_mark, buff_dec_inp, buff_y_mark)[0]
                     else:
-                        out = self.model(buff_x, buff_x_mark, dec_inp, buff_y_mark)
+                        out = self.model(buff_x, buff_x_mark, buff_dec_inp, buff_y_mark)
                 if self.args.inverse:
                     out = dataset_object.inverse_transform(out)
                 out = out.reshape((out.shape[0], -1))
-                loss += 0.2* criterion(out, buff_y)
+                loss += 0.2 * criterion(out, buff_y)
             loss.backward()
             self.opt.step()       
             
