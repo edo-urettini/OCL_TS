@@ -40,7 +40,8 @@ class Exp_TS2VecSupervised(Exp_Basic):
         self.model = Informer(args.enc_in, args.dec_in, args.c_out, args.seq_len, args.label_len, args.pred_len)
         self.model.to(self.device)
 
-        self.buffer = Buffer(500, self.device) 
+        self.buffer = Buffer(500, self.device)
+        self.count = 0
         
         if args.finetune:
             inp_var = 'univar' if args.features == 'S' else 'multivar'
@@ -322,14 +323,15 @@ class Exp_TS2VecSupervised(Exp_Basic):
             # replay
             if not self.buffer.is_empty():
                 buff_x, buff_y, idx = self.buffer.get_data(8)
-                buff_x, buff_x_mark = buff_x
-                buff_y, buff_y_mark = buff_y
+                buff_x, buff_x_mark = buff_x[:, :, :self.args.c_out], buff_x[:, :, self.args.c_out:]
+                buff_y, buff_y_mark = buff_y[:, :, :self.args.c_out], buff_y[:, :, self.args.c_out:]
+                buff_true = rearrange(buff_y, 'b t d -> b (t d)').float().to(self.device)
 
                 # decoder input
                 if self.args.padding==0:
-                    buff_dec_inp = torch.zeros([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float()
+                    buff_dec_inp = torch.zeros([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float().to(self.device)
                 elif self.args.padding==1:
-                    buff_dec_inp = torch.ones([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float()
+                    buff_dec_inp = torch.ones([buff_y.shape[0], self.args.pred_len, buff_y.shape[-1]]).float().to(self.device)
                 buff_dec_inp = torch.cat([buff_y[:,:self.args.label_len,:], buff_dec_inp], dim=1).float().to(self.device)
                 # encoder - decoder
                 if self.args.use_amp:
@@ -346,13 +348,17 @@ class Exp_TS2VecSupervised(Exp_Basic):
                 if self.args.inverse:
                     out = dataset_object.inverse_transform(out)
                 out = out.reshape((out.shape[0], -1))
-                loss += 0.2 * criterion(out, buff_y)
+                loss += 0.2 * criterion(out, buff_true)
             loss.backward()
             self.opt.step()       
             
             self.opt.zero_grad()
 
         f_dim = -1 if self.args.features=='MS' else 0
+        batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
+        idx = self.count +  torch.arange(batch_y.size(0)).to(self.device)
+        self.count += batch_y.size(0)
+        self.buffer.add_data(examples = torch.cat([batch_x, batch_x_mark], dim=2), labels = torch.cat([batch_y, batch_y_mark], dim=2), logits = idx)
         batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
         return outputs, rearrange(batch_y, 'b t d -> b (t d)')
 

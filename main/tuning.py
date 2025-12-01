@@ -10,10 +10,10 @@ import os
 import yaml
 import importlib
 
-from utils.tools import init_dl_program
+from main.utils.tools import init_dl_program
 import copy
 
-STORAGE_PATH = "./ray_results"      # change this path if needed
+STORAGE_PATH = "/home/datzeni/OCL_TS/ray_results"      # change this path if needed
 
 def online_hpo(args, exp, setting, best_model_path):
     """
@@ -35,29 +35,32 @@ def online_hpo(args, exp, setting, best_model_path):
 
     # Define the hyperparameter search space.
     search_space = {
-        "online_lr": tune.loguniform(1e-4, 1e-1),
+        "online_lr": tune.loguniform(1e-5, 1e-1),
+        "NatSR_regul": tune.uniform(1e-5, 1),
+        "NatSR_alpha_ema": tune.choice([0.5548965149124905]),
+        "NatSR_score_lr": tune.choice([0.09301814529279252])
     }
 
     def train_function(config, base_args):
-        try: 
-            trial_args = copy.deepcopy(base_args)
-            for key, value in config.items():
-                setattr(trial_args, key, value)
+        #try: 
+        trial_args = copy.deepcopy(base_args)
+        for key, value in config.items():
+            setattr(trial_args, key, value)
 
-            init_dl_program(trial_args.gpu, seed=trial_args.finetune_model_seed)
+        init_dl_program(trial_args.gpu, seed=trial_args.finetune_model_seed)
 
-            Exp = getattr(importlib.import_module('exp.exp_{}'.format(trial_args.method)), 'Exp_TS2VecSupervised')
-            trial_exp = Exp(trial_args)
+        Exp = getattr(importlib.import_module('exp.exp_{}'.format(trial_args.method)), 'Exp_TS2VecSupervised')
+        trial_exp = Exp(trial_args)
 
-            trial_exp.model.load_state_dict(torch.load(best_model_path)) 
+        trial_exp.model.load_state_dict(torch.load(best_model_path)) 
 
-            metrics, _, _, _, _ = trial_exp.test(setting, data='test')
-            mse = {"mse": metrics[1]}
-            
-            if np.isnan(mse["mse"]):
-                mse["mse"] = 1e10
-        except Exception as e:
-            mse = {"mse": 1e20}
+        metrics, _, _, _, _ = trial_exp.test(setting, data='test')
+        mse = {"mse": metrics[1]}
+        
+        if np.isnan(mse["mse"]):
+            mse["mse"] = 1e10
+        #except Exception as e:
+        #    mse = {"mse": 1e20}
 
         tune.report(mse)  
 
