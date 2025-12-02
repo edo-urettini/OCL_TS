@@ -292,7 +292,7 @@ class Exp_TS2VecSupervised(Exp_Basic):
         criterion = self._select_criterion()
         
         batch_x = batch_x.float().to(self.device)
-        batch_y = batch_y.float()
+        batch_y = batch_y.float().to(self.device)
 
         batch_x_mark = batch_x_mark.float().to(self.device)
         batch_y_mark = batch_y_mark.float().to(self.device)
@@ -300,9 +300,9 @@ class Exp_TS2VecSupervised(Exp_Basic):
         for _ in range(self.n_inner):
             # decoder input
             if self.args.padding==0:
-                dec_inp = torch.zeros([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float()
+                dec_inp = torch.zeros([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float().to(self.device)
             elif self.args.padding==1:
-                dec_inp = torch.ones([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float()
+                dec_inp = torch.ones([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float().to(self.device)
             dec_inp = torch.cat([batch_y[:,:self.args.label_len,:], dec_inp], dim=1).float().to(self.device)
             # encoder - decoder
             if self.args.use_amp:
@@ -354,11 +354,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
             
             self.opt.zero_grad()
 
-        f_dim = -1 if self.args.features=='MS' else 0
-        batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
         idx = self.count +  torch.arange(batch_y.size(0)).to(self.device)
         self.count += batch_y.size(0)
         self.buffer.add_data(examples = torch.cat([batch_x, batch_x_mark], dim=2), labels = torch.cat([batch_y, batch_y_mark], dim=2), logits = idx)
+        
+        f_dim = -1 if self.args.features=='MS' else 0
         batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
         return outputs, rearrange(batch_y, 'b t d -> b (t d)')
 

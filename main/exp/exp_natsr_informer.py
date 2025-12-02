@@ -433,11 +433,11 @@ class Exp_TS2VecSupervised(Exp_Basic):
             
             self.opt.zero_grad()
 
-        f_dim = -1 if self.args.features=='MS' else 0
-        batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
         idx = self.count +  torch.arange(batch_y.size(0)).to(self.device)
         self.count += batch_y.size(0)
         self.buffer.add_data(examples = torch.cat([batch_x, batch_x_mark], dim=2), labels = torch.cat([batch_y, batch_y_mark], dim=2), logits = idx)
+        
+        f_dim = -1 if self.args.features=='MS' else 0
         batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
         return outputs, rearrange(batch_y, 'b t d -> b (t d)')
 
